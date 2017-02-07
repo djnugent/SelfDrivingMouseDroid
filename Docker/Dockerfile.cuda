@@ -1,0 +1,88 @@
+# docker-CNN - A Keras and OpenCV Docker for reproducible deep learning
+#            - GPU Version
+#            - TensorFlow version
+#            - Build Cuda from scratch
+#            - Original: https://github.com/gw0/docker-keras
+
+
+
+
+# Install Debian 9 with CUDA Toolkit 7.5 and cuDNN 5.1
+
+FROM debian:stretch
+
+# install from repositories
+ENV DEBIAN_FRONTEND noninteractive
+RUN echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/99AcquireRetries \
+    # configure debian repositories
+ && sed -i 's/main$/main contrib non-free/' /etc/apt/sources.list
+RUN apt-get update -qq \
+ && apt-get install --no-install-recommends -y \
+    # install essentials
+    wget \
+    # install cuda toolkit 7.5
+    nvidia-cuda-toolkit \
+    nvidia-smi \
+    # install cuda opencl
+    nvidia-opencl-icd \
+    #nvidia-opencl-dev \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+# install manually
+RUN wget -nv -P /root/debs http://developer.download.nvidia.com/compute/redist/cudnn/v5.1/libcudnn5_5.1.5-1+cuda8.0_amd64.deb \
+ && wget -nv -P /root/debs http://developer.download.nvidia.com/compute/redist/cudnn/v5.1/libcudnn5-dev_5.1.5-1+cuda8.0_amd64.deb \
+ && echo "2e71330c74262c097caa598df2f32903cb4ffe3b2aeea8decd4e7ae06994e3b0  /root/debs/libcudnn5_5.1.5-1+cuda8.0_amd64.deb" | sha256sum -c --strict - \
+ && echo "9db2cbbc80aea6bad82f64728c2b6922eb2c1dc21d6ec7348fc758d1fe4312cd  /root/debs/libcudnn5-dev_5.1.5-1+cuda8.0_amd64.deb" | sha256sum -c --strict - \
+    # install cudnn 5.1
+ && dpkg -i /root/debs/libcudnn5_5.1.5-1+cuda8.0_amd64.deb \
+ && dpkg -i /root/debs/libcudnn5-dev_5.1.5-1+cuda8.0_amd64.deb \
+&& rm -rf /root/debs
+
+# install debian packages
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update -qq \
+ && apt-get install --no-install-recommends -y \
+    # install essentials
+    build-essential \
+    g++ \
+    git \
+    # install python 2
+    python \
+    python-dev \
+    python-pip \
+    python-setuptools \
+    python-virtualenv \
+    python-wheel \
+    pkg-config \
+    # requirements for numpy
+    libopenblas-base \
+    python-numpy \
+    python-scipy \
+    # requirements for keras
+    python-h5py \
+    python-yaml \
+    python-pydot \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+
+# Install Keras
+ARG TENSORFLOW_VERSION=0.12.1
+ARG TENSORFLOW_DEVICE=gpu
+ARG TENSORFLOW_APPEND=_gpu
+RUN pip --no-cache-dir install https://storage.googleapis.com/tensorflow/linux/${TENSORFLOW_DEVICE}/tensorflow${TENSORFLOW_APPEND}-${TENSORFLOW_VERSION}-cp27-none-linux_x86_64.whl
+
+ARG KERAS_VERSION=1.2.1
+ENV KERAS_BACKEND=tensorflow
+RUN pip --no-cache-dir install --no-dependencies git+https://github.com/fchollet/keras.git@${KERAS_VERSION}
+
+#OpenCV
+RUN pip install opencv-python
+
+# dump package lists
+RUN dpkg-query -l > /dpkg-query-l.txt \
+ && pip2 freeze > /pip2-freeze.txt
+
+WORKDIR /srv/
+CMD /bin/bash
