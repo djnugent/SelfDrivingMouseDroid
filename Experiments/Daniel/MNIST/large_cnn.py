@@ -41,11 +41,11 @@ def large_cnn():
 	# Compile model
 	model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 	return model
-    
+
 # build the model
 model =large_cnn()
 # Fit the model
-model.fit(X_train, y_train, validation_data=(X_test, y_test), nb_epoch=10, batch_size=200, verbose=2)
+model.fit(X_train, y_train, validation_data=(X_test, y_test), nb_epoch=10, batch_size=200, verbose=1)
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test, verbose=1)
 print("Baseline Error: %.2f%%" % (100-scores[1]*100))
