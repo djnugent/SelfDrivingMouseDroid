@@ -29,6 +29,9 @@ RUN apt-get update -qq \
     python-h5py \
     python-yaml \
     python-pydot \
+    # Open CV
+    libopencv-dev \
+    python-opencv \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
@@ -42,8 +45,6 @@ ARG KERAS_VERSION=1.2.1
 ENV KERAS_BACKEND=tensorflow
 RUN pip --no-cache-dir install --no-dependencies git+https://github.com/fchollet/keras.git@${KERAS_VERSION}
 
-#OpenCV
-RUN pip install opencv-python
 
 # dump package lists
 RUN dpkg-query -l > /dpkg-query-l.txt \

@@ -24,9 +24,12 @@ Docker is a way to run software in VM that has the same environment **EVERYTIME*
  - There is no DISPLAY object for docker instances. That means you can't run GUI applications. There are docker images that support VNC servers but that shouldn't be necessary for what we are doing. I am working on a python webserver module that will allow us to stream videos or images from python to a webpage for quick debugging.
  - When communicating over the network with a docker instance, the IP address can be found at the top of the terminal session. It gets printed once it starts. **Remember to do port mapping!!!**
  - If you install software(using apt-get, pip, etc) while an instance is running, the software will only persist for that session. Meaning next time you run the image, you will have to reinstall it. If you want new software to persist between sessions you need to modify the Dockerfile and rebuild the image.
+ - In order to leverage the GPU images you must install `nvidia-docker`(this assumes you have to proper nvidia/cuda/cudnn drivers installed on the host machine) You can install `nvidia-docker` using the following command:
+
+    `wget -P /tmp https://github.com/NVIDIA/nvidia-docker/releases/download/v1.0.0/nvidia-docker_1.0.0-1_amd64.deb && sudo dpkg -i /tmp/nvidia-docker*.deb && rm /tmp/nvidia-docker*.deb`
 
 
 ## Images
   - **Dockerfile.cpu** - CPU version of keras/tensorflow
-  - **Dockerfile.gpu** - GPU version of keras/tensorflow with prebuilt cuda
-  - **Dockerfile.cuda** - GPU version of keras/tensorflow that rebuilds cuda(slow but low dependencies)
+  - **Dockerfile.gpu** - GPU version of keras/tensorflow with prebuilt cuda. Note: *Run `nvidia-docker` instead of `docker`*
+  - **Dockerfile.cuda** - GPU version of keras/tensorflow that rebuilds cuda(slow but low dependencies) Note: *Run `nvidia-docker` instead of `docker`*

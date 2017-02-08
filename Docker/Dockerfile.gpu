@@ -29,9 +29,12 @@ RUN apt-get update -qq \
     python-h5py \
     python-yaml \
     python-pydot \
+    # Open CV
+    libopencv-dev \
+    python-opencv \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
- 
+
 # Install Keras
 ARG TENSORFLOW_VERSION=0.12.1
 ARG TENSORFLOW_DEVICE=gpu
