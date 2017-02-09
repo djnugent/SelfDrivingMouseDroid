@@ -48,3 +48,8 @@
 
 ## TODO:
   - Figure out how to install Nvidia driver without clobbering your system
+  - `sudo apt-get install nvidia-375 nvidia-settings nvidia-common`
+  - `sudo update-alternatives --config x86_64-linux-gnu_gl_conf` select 0
+  - `sudo nvidia-xconfig`
+  - `sudo ldconfig`
+  - Reboot
