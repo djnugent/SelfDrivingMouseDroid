@@ -1,0 +1,56 @@
+# docker-CNN - A Keras and OpenCV Docker for reproducible deep learning
+#            - GPU Version
+#            - TensorFlow version
+#            - Original: https://github.com/gw0/docker-keras
+
+FROM gw000/debian-cuda:8.0_5.1
+
+# install debian packages
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update -qq \
+ && apt-get install --no-install-recommends -y \
+    # install essentials
+    build-essential \
+    g++ \
+    git \
+    # install python 2
+    python \
+    python-dev \
+    python-pip \
+    python-setuptools \
+    python-virtualenv \
+    python-wheel \
+    pkg-config \
+    # requirements for numpy
+    libopenblas-base \
+    python-numpy \
+    python-scipy \
+    # requirements for keras
+    python-h5py \
+    python-yaml \
+    python-pydot \
+    # Open CV
+    libopencv-dev \
+    python-opencv \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install Keras
+ARG TENSORFLOW_VERSION=0.12.1
+ARG TENSORFLOW_DEVICE=gpu
+ARG TENSORFLOW_APPEND=_gpu
+RUN pip --no-cache-dir install https://storage.googleapis.com/tensorflow/linux/${TENSORFLOW_DEVICE}/tensorflow${TENSORFLOW_APPEND}-${TENSORFLOW_VERSION}-cp27-none-linux_x86_64.whl
+
+ARG KERAS_VERSION=1.2.1
+ENV KERAS_BACKEND=tensorflow
+RUN pip --no-cache-dir install --no-dependencies git+https://github.com/fchollet/keras.git@${KERAS_VERSION}
+
+#OpenCV
+RUN pip install opencv-python
+
+# dump package lists
+RUN dpkg-query -l > /dpkg-query-l.txt \
+ && pip2 freeze > /pip2-freeze.txt
+
+WORKDIR /srv/
+CMD /bin/bash
