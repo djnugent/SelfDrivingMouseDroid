@@ -9,5 +9,5 @@ The durham server contains a Titan X which is the most powerful GPU we have. Mul
   * Only need to install once.
 3. Set up environment variable, run `source cuda_env.sh`
   * The source file can be found in this directory
-4. Run your python code!!
+4. Run your python code!!ls
 5. exit the ssh session `exit`
