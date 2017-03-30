@@ -33,7 +33,7 @@ ERROR_IMAGE = cv2.imencode('.jpg', blank)[1].tobytes()
 live_image = START_IMAGE
 
 def flask_thread():
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=8080)
 
 # Call this method to queue a new image for the webserver
 def imshow(image, title="Hello World"):
@@ -68,7 +68,7 @@ def video_feed():
     return Response(__gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 # Start server
-print "VideoDebugger server running on http://0.0.0.0:80/"
+print("VideoDebugger server running on http://0.0.0.0:8080/")
 t = Thread(target=flask_thread, args=())
 t.daemon =True
 t.start()
