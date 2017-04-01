@@ -1,4 +1,4 @@
-#include <Servo.h>
+#include <ServoTimer2.h>
 
 /*This program puts the servo values into an array,
  reagrdless of channel number, polarity, ppm frame length, etc...
@@ -9,7 +9,8 @@
 #define PWM_channel_2 5
 int ppm[16];  //array for storing up to 16 servo signals
 
-Servo steering;
+ServoTimer2 steering;
+ServoTimer2 throttle;
 
 void setup()
 {
@@ -20,12 +21,12 @@ void setup()
   attachInterrupt(PPM_Pin - 2, read_ppm, CHANGE);
 
   //pinMode(PWM_channel_1, OUTPUT);
-  steering.attach(PWM_channel_1, 990, 2015);
-  pinMode(PWM_channel_2, OUTPUT);
+  steering.attach(PWM_channel_1);
+  throttle.attach(PWM_channel_2);
 
-  TCCR2A = 0;  //reset timer1
-  TCCR2B = 0;
-  TCCR2B |= (1 << CS11);  //set timer1 to increment every 0,5 us
+  TCCR1A = 0;  //reset timer1
+  TCCR1B = 0;
+  TCCR1B |= (1 << CS11);  //set timer1 to increment every 0,5 us
 }
 
 void loop()
@@ -43,11 +44,11 @@ void loop()
 
   //int channel_1 = map(ppm[0], 990, 2015, 0, 255);
   int channel_1 = ppm[0];
-  int channel_2 = map(ppm[1], 985, 2015, 0, 255);
+  int channel_2 = ppm[1];
 
   //analogWrite(PWM_channel_1, channel_1);
-  steering.writeMicroseconds(channel_1);
-  analogWrite(PWM_channel_2, channel_2);
+  steering.write(channel_1);
+  throttle.write(channel_2);
   Serial.println("");
   Serial.print(channel_1);
   Serial.print("   ");
@@ -61,8 +62,8 @@ void read_ppm(){  //leave this alone
   static unsigned long counter;
   static byte channel;
 
-  counter = TCNT2;
-  TCNT2 = 0;
+  counter = TCNT1;
+  TCNT1 = 0;
 
   if(counter < 1020){  //must be a pulse if less than 510us
     pulse = counter;
