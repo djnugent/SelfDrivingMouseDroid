@@ -4,6 +4,17 @@
  reagrdless of channel number, polarity, ppm frame length, etc...
  You can even change these while scanning!*/
 
+
+
+
+
+// DO NOT ATTACH ESC POSITIVE TO 5V IF ARDUINO IS POWERED BY USB
+// YOU CAN BURN OUT YOUR COMPUTER
+
+
+
+
+
 #define PPM_Pin 3  //this must be 2 or 3
 #define PWM_channel_1 6
 #define PWM_channel_2 5
