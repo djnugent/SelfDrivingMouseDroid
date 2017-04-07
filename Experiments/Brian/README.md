@@ -12,3 +12,11 @@ To run a docker file
 	f) Build the docker file e.g.	>> docker build -t docker-base -f Dockerfile.cpu .
 	g) ssh into Boot2Docker VM	>> docker-machine ssh default
 	h) Run the docker		>> docker run -it --volume /VM_share:/srv docker-base
+
+
+http://cudamusing.blogspot.com/2015/11/building-tensorflow-for-jetson-tk1.html
+
+when running on flash drive need to do
+sudo sh <program>
+
+http://stackoverflow.com/questions/38120408/install-tensorflow-from-source
