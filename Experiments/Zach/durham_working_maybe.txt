@@ -1,0 +1,160 @@
+[zwbce@du310-06 ~]$ python3 Dec1721-Senior-Design/Experiments/Zach/mnist.py                            Using TensorFlow backend.
+Traceback (most recent call last):
+  File "/usr/lib/python3.4/site-packages/tensorflow/python/__init__.py", line 61, in <module>
+    from tensorflow.python import pywrap_tensorflow
+  File "/usr/lib/python3.4/site-packages/tensorflow/python/pywrap_tensorflow.py", line 28, in <module>
+    _pywrap_tensorflow = swig_import_helper()
+  File "/usr/lib/python3.4/site-packages/tensorflow/python/pywrap_tensorflow.py", line 24, in swig_import_helper
+    _mod = imp.load_module('_pywrap_tensorflow', fp, pathname, description)
+  File "/usr/lib64/python3.4/imp.py", line 243, in load_module
+    return load_dynamic(name, filename, file)
+ImportError: libcudart.so.8.0: cannot open shared object file: No such file or directory
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "Dec1721-Senior-Design/Experiments/Zach/mnist.py", line 2, in <module>
+    from keras.datasets import mnist
+  File "/home/zwbce/.local/lib/python3.4/site-packages/keras/__init__.py", line 3, in <module>
+    from . import activations
+  File "/home/zwbce/.local/lib/python3.4/site-packages/keras/activations.py", line 3, in <module>
+    from . import backend as K
+  File "/home/zwbce/.local/lib/python3.4/site-packages/keras/backend/__init__.py", line 64, in <module>
+    from .tensorflow_backend import *
+  File "/home/zwbce/.local/lib/python3.4/site-packages/keras/backend/tensorflow_backend.py", line 1, in <module>
+    import tensorflow as tf
+  File "/usr/lib/python3.4/site-packages/tensorflow/__init__.py", line 24, in <module>
+    from tensorflow.python import *
+  File "/usr/lib/python3.4/site-packages/tensorflow/python/__init__.py", line 72, in <module>
+    raise ImportError(msg)
+ImportError: Traceback (most recent call last):
+  File "/usr/lib/python3.4/site-packages/tensorflow/python/__init__.py", line 61, in <module>
+    from tensorflow.python import pywrap_tensorflow
+  File "/usr/lib/python3.4/site-packages/tensorflow/python/pywrap_tensorflow.py", line 28, in <module>
+    _pywrap_tensorflow = swig_import_helper()
+  File "/usr/lib/python3.4/site-packages/tensorflow/python/pywrap_tensorflow.py", line 24, in swig_import_helper
+    _mod = imp.load_module('_pywrap_tensorflow', fp, pathname, description)
+  File "/usr/lib64/python3.4/imp.py", line 243, in load_module
+    return load_dynamic(name, filename, file)
+ImportError: libcudart.so.8.0: cannot open shared object file: No such file or directory
+
+
+Failed to load the native TensorFlow runtime.
+
+See https://github.com/tensorflow/tensorflow/blob/master/tensorflow/g3doc/get_started/os_setup.md#import_error
+
+for some common reasons and solutions.  Include the entire stack trace
+above this error message when asking for help.
+[zwbce@du310-06 ~]$ pip install --user opencv-python keras tensorflow-gpu
+Requirement already satisfied: opencv-python in ./.local/lib/python3.4/site-packages
+Requirement already satisfied: keras in ./.local/lib/python3.4/site-packages
+Requirement already satisfied: tensorflow-gpu in /usr/lib64/python3.4/site-packages
+Requirement already satisfied: numpy>=1.11.3 in /usr/lib64/python3.4/site-packages (from opencv-python)
+Requirement already satisfied: theano in ./.local/lib/python3.4/site-packages (from keras)
+Requirement already satisfied: pyyaml in ./.local/lib/python3.4/site-packages (from keras)
+Requirement already satisfied: six in /usr/lib/python3.4/site-packages (from keras)
+Requirement already satisfied: protobuf>=3.1.0 in /usr/lib64/python3.4/site-packages (from tensorflow-gpu)
+Requirement already satisfied: wheel>=0.26 in /usr/lib/python3.4/site-packages (from tensorflow-gpu)
+Requirement already satisfied: scipy>=0.14 in /usr/lib64/python3.4/site-packages (from theano->keras)
+Requirement already satisfied: setuptools in /usr/lib/python3.4/site-packages (from protobuf>=3.1.0->tensorflow-gpu)
+[zwbce@du310-06 ~]$ pip install --user opencv-python keras tensorflow tensorflow-gpu
+Requirement already satisfied: opencv-python in ./.local/lib/python3.4/site-packages
+Requirement already satisfied: keras in ./.local/lib/python3.4/site-packages
+Collecting tensorflow
+  Downloading tensorflow-1.0.1-cp34-cp34m-manylinux1_x86_64.whl (44.1MB)
+    100% |████████████████████████████████| 44.1MB 16kB/s
+Requirement already satisfied: tensorflow-gpu in /usr/lib64/python3.4/site-packages
+Requirement already satisfied: numpy>=1.11.3 in /usr/lib64/python3.4/site-packages (from opencv-python)
+Requirement already satisfied: theano in ./.local/lib/python3.4/site-packages (from keras)
+Requirement already satisfied: pyyaml in ./.local/lib/python3.4/site-packages (from keras)
+Requirement already satisfied: six in /usr/lib/python3.4/site-packages (from keras)
+Requirement already satisfied: wheel>=0.26 in /usr/lib/python3.4/site-packages (from tensorflow)
+Requirement already satisfied: protobuf>=3.1.0 in /usr/lib64/python3.4/site-packages (from tensorflow)
+Requirement already satisfied: scipy>=0.14 in /usr/lib64/python3.4/site-packages (from theano->keras)
+Requirement already satisfied: setuptools in /usr/lib/python3.4/site-packages (from protobuf>=3.1.0->tensorflow)
+Installing collected packages: tensorflow
+
+^COperation cancelled by user
+[zwbce@du310-06 ~]$ source Dec1721-Senior-Design/Guides/cuda_bash.sh
+Setting up CUDA environment for Bash shell with Python3
+Done!
+[zwbce@du310-06 ~]$ cd Dec1721-Senior-Design/
+[zwbce@du310-06 Dec1721-Senior-Design]$ git pull
+
+(gnome-ssh-askpass:21957): Gtk-WARNING **: cannot open display:
+error: unable to read askpass response from '/usr/libexec/openssh/gnome-ssh-askpass'
+Username for 'https://git.ece.iastate.edu': zwbce
+
+(gnome-ssh-askpass:21985): Gtk-WARNING **: cannot open display:
+error: unable to read askpass response from '/usr/libexec/openssh/gnome-ssh-askpass'
+Password for 'https://zwbce@git.ece.iastate.edu':
+remote: Counting objects: 48, done.
+remote: Compressing objects: 100% (29/29), done.
+remote: Total 48 (delta 17), reused 44 (delta 14)
+Unpacking objects: 100% (48/48), done.
+From https://git.ece.iastate.edu/zwbce/Dec1721-Senior-Design
+   23ddc73..56aae00  master     -> origin/master
+Updating 23ddc73..56aae00
+Fast-forward
+ .../Generate_PPM_signal_nodelay/Generate_PPM_signal_nodelay.ino   |  76 ++++++++++++++++
+ Experiments/Zach/Arduino/Read_any_PPM/Read_any_PPM.ino            |  56 ++++++++++++
+ Experiments/Zach/Arduino/read_ppm_to_pwm/read_ppm_to_pwm.ino      |  48 ++++++++++
+ Experiments/Zach/Arduino/test_pwm/test_pwm.ino                    |  22 +++++
+ Experiments/Zach/{ => NeuralNetworks/CIFAR10}/cifar10.py          | 112 ++++++++++++------------
+ Experiments/Zach/{ => NeuralNetworks/CIFAR10}/larger_cifar10.py   | 136 ++++++++++++++---------------
+ .../Zach/{ => NeuralNetworks/mnist}/convolutional_mnist.py        |   0
+ .../Zach/{ => NeuralNetworks/mnist}/large_convolutional_mnist.py  |   0
+ Experiments/Zach/{ => NeuralNetworks/mnist}/mnist.py              |   0
+ Experiments/Zach/README.md                                        |   2 +
+ Experiments/Zach/durham_error.txt                                 |  47 ++++++++++
+ 11 files changed, 375 insertions(+), 124 deletions(-)
+ create mode 100644 Experiments/Zach/Arduino/Generate_PPM_signal_nodelay/Generate_PPM_signal_nodelay.ino
+ create mode 100644 Experiments/Zach/Arduino/Read_any_PPM/Read_any_PPM.ino
+ create mode 100644 Experiments/Zach/Arduino/read_ppm_to_pwm/read_ppm_to_pwm.ino
+ create mode 100644 Experiments/Zach/Arduino/test_pwm/test_pwm.ino
+ rename Experiments/Zach/{ => NeuralNetworks/CIFAR10}/cifar10.py (94%)
+ rename Experiments/Zach/{ => NeuralNetworks/CIFAR10}/larger_cifar10.py (95%)
+ rename Experiments/Zach/{ => NeuralNetworks/mnist}/convolutional_mnist.py (100%)
+ rename Experiments/Zach/{ => NeuralNetworks/mnist}/large_convolutional_mnist.py (100%)
+ rename Experiments/Zach/{ => NeuralNetworks/mnist}/mnist.py (100%)
+ create mode 100644 Experiments/Zach/durham_error.txt
+[zwbce@du310-06 Dec1721-Senior-Design]$ python Experiments/Zach/NeuralNetworks/mnist/mnist.py
+: command not found...
+Similar command is: 'python3'
+[zwbce@du310-06 Dec1721-Senior-Design]$ python3 Experiments/Zach/NeuralNetworks/mnist/mnist.py
+Using TensorFlow backend.
+Downloading data from https://s3.amazonaws.com/img-datasets/mnist.npz
+Experiments/Zach/NeuralNetworks/mnist/mnist.py:33: UserWarning: Update your `Dense` call to the Keras 2 API: `Dense(784, kernel_initializer="normal", input_dim=784, activation="relu")`
+  model.add(Dense(num_pixels, input_dim=num_pixels, init='normal', activation='relu'))
+Experiments/Zach/NeuralNetworks/mnist/mnist.py:34: UserWarning: Update your `Dense` call to the Keras 2 API: `Dense(10, kernel_initializer="normal", activation="softmax")`
+  model.add(Dense(num_classes, init='normal', activation='softmax'))
+/home/zwbce/.local/lib/python3.4/site-packages/keras/models.py:826: UserWarning: The `nb_epoch` argument in `fit` has been renamed `epochs`.
+  warnings.warn('The `nb_epoch` argument in `fit` '
+Train on 60000 samples, validate on 10000 samples
+Epoch 1/10
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE3 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
+9s - loss: 0.2793 - acc: 0.9208 - val_loss: 0.1417 - val_acc: 0.9575
+Epoch 2/10
+9s - loss: 0.1116 - acc: 0.9676 - val_loss: 0.0924 - val_acc: 0.9703
+Epoch 3/10
+9s - loss: 0.0718 - acc: 0.9798 - val_loss: 0.0786 - val_acc: 0.9769
+Epoch 4/10
+9s - loss: 0.0504 - acc: 0.9858 - val_loss: 0.0747 - val_acc: 0.9770
+Epoch 5/10
+9s - loss: 0.0373 - acc: 0.9893 - val_loss: 0.0675 - val_acc: 0.9786
+Epoch 6/10
+9s - loss: 0.0268 - acc: 0.9928 - val_loss: 0.0638 - val_acc: 0.9807
+Epoch 7/10
+9s - loss: 0.0212 - acc: 0.9946 - val_loss: 0.0613 - val_acc: 0.9819
+Epoch 8/10
+9s - loss: 0.0141 - acc: 0.9968 - val_loss: 0.0631 - val_acc: 0.9790
+Epoch 9/10
+9s - loss: 0.0109 - acc: 0.9978 - val_loss: 0.0593 - val_acc: 0.9811
+Epoch 10/10
+9s - loss: 0.0078 - acc: 0.9986 - val_loss: 0.0595 - val_acc: 0.9814
+Baseline Error: 1.86%
