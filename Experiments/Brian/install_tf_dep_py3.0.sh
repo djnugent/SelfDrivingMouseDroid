@@ -1,4 +1,5 @@
 #!/bin/bash
+#!/bin/bash
 sudo apt-get update
 # pre req's
 sudo apt-get update -qq 
@@ -6,43 +7,25 @@ sudo apt-get install -y \
 	build-essential \
 	g++ \
 	git \
-#	python3.0 \
-#	python3.0-dev \
-# 	python3.0-pip \
-#	python3.0-setuptools \
-#	python3.0-virtualenv \
-#	python3.0-wheel \
-
-
-	python \
-	python-dev \
-	python-pip \
-	python-setuptools \
-	python-virtualenv \
-	python-wheel \
+	python3.0 \
+	python3.0-dev \
+ 	python3.0-pip \
+	python3.0-setuptools \
+	python3.0-virtualenv \
+	python3.0-wheel \
 	pkg-config \
 
 	libopenblas-base \
-#	python3.0-numpy \
-#	python3.0-scipy \
+	python3.0-numpy \
+	python3.0-scipy \
+	
+	python3.0-h5py \
+	python3.0-yaml \
+	python3.0-pydot \
 
-	python-numpy \
-	python-scipy \
-	
-	python-h5py \
-	python-yaml \
-	python-pydot \
-	
-#	python3.0-h5py \
-#	python3.0-yaml \
-#	python3.0-pydot \
-
-	libopencv-dev \
-	python-opencv \
-	python-serial
-	
-#	python3.0-opencv \
-#	python-serial
+	libopencv-dev \	
+	python3.0-opencv \
+	python3.0-serial
 	
 # for protobuf
 sudo apt-get install autoconf automake libtool maven
@@ -53,7 +36,8 @@ sudo apt-get install pkg-config zip g++ zlib1g-dev unzip openjdk-8-jdk
 sudo update-alternatives --config java
 2
 # tensorflow
-sudo apt-get install python-pip python-numpy swig python-dev
+#sudo apt-get install python-pip python-numpy swig python-dev
+sudo apt-get install swig
 sudo pip install wheel
 
 # optimization
