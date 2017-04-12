@@ -6,25 +6,25 @@ from Car import Car
 # folder setup
 folder = "training_data"
 iteration = "1"
-f = open(folder+ "\\" + iteration + "\data.txt", 'w')
+f = open(folder+ "\\" + iteration + "\\data.txt", 'w')
 
 # car setup
 car = Car()
 car.connect(port="COM8")
 print("Waiting to hear from vehicle...")
 
-while(not car.connected):
-    time.sleep(0.05)
+#while(not car.connected):
+ #   time.sleep(0.05)
 print("Car is connected!")
 
 
 # video setup
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 count = 0
 success = True
 
 time_prev = time.time()
-images_per_second = 1 #change this!!
+images_per_second = 5 #change this!!
 time_span = 1 / images_per_second 
 
 while success:
@@ -41,7 +41,7 @@ while success:
         #print 'Read a new frame: ', success
 
         cv2.imshow("feed", image);
-        cv2.imwrite(folder+ "\\" + iteration + "\%d.jpg" % count, image)
+        cv2.imwrite(folder+ "\\" + iteration + "\\%d.jpg" % count, image)
 
         f.write(str(steering_command) + " " + str(count) + ".jpg\n")
 
