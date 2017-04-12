@@ -25,7 +25,7 @@
 
 #define HEARTBEAT_LEN     4
 #define CHANNELS_IN_LEN   10
-#define CONTROL_LEN       20
+#define CONTROL_LEN       10
 #define SET_MODE_LEN      3
 #define DEBUG_LEN         14
 const int msg_len[5] = {HEARTBEAT_LEN,CHANNELS_IN_LEN,CONTROL_LEN,SET_MODE_LEN,DEBUG_LEN };

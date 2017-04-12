@@ -63,6 +63,7 @@ void handle_control(uint8_t* payload){
   decode_control(payload,&control);
 
   //echo it back as a channels_in msg
+  //send_debug(control.throttle,control.steering,control.aux1);
   send_channels_in(control.throttle,control.steering,control.aux1,control.aux2);
 }
 
@@ -83,9 +84,7 @@ void recv_msg(){
       byte b = Serial.peek();
       if(b == START){break;}
       else{
-        Serial.read();
-        dropped++;
-        send_debug(dropped,0,0);
+        Serial.read();       
        }
     }
     //discard start byte
