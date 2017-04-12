@@ -33,12 +33,12 @@ while success:
         
         success,image = cap.read()
 
-        #resize image
+        image = cv2.resize(image, (0,0), fx=0.5, fy=0.5) 
 
         channels = car.channels_in;
         steering_command = channels["steering"]
 
-        print 'Read a new frame: ', success
+        #print 'Read a new frame: ', success
 
         cv2.imshow("feed", image);
         cv2.imwrite(folder+ "\\" + iteration + "\%d.jpg" % count, image)
