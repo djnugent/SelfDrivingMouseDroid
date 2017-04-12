@@ -1,7 +1,7 @@
 import cv2
 import time
 
-#from Car import Car 
+from Car import Car 
 
 # folder setup
 folder = "training_data"
@@ -9,12 +9,12 @@ iteration = "1"
 f = open(folder+ "\\" + iteration + "\data.txt", 'w')
 
 # car setup
-#car = Car()
-#car.connect(port="COM8")
+car = Car()
+car.connect(port="COM3")
 #print("Waiting to hear from vehicle...")
 
-#while(not car.connected):
- #   time.sleep(0.05)
+while(not car.connected):
+    time.sleep(0.05)
 #print("Car is connected!")
 
 
@@ -36,9 +36,9 @@ try:
 
             image = cv2.resize(image, (0,0), fx=0.5, fy=0.5) 
 
-            #channels = car.channels_in;
-            #steering_command = channels["steering"]
-            steering_command = 0
+            channels = car.channels_in;
+            steering_command = channels["steering"]
+            #steering_command = 0
             
             #print 'Read a new frame: ', success
 
