@@ -2,11 +2,22 @@
 
 /*This program puts the servo values into an array,
  reagrdless of channel number, polarity, ppm frame length, etc...
- You can even change these while scanning!*/
+ Values are then transmitted to the 2 servos, steering and ESC*/
+
+
+
+
+
+// DO NOT ATTACH ESC POSITIVE TO 5V IF ARDUINO IS POWERED BY USB
+// YOU CAN BURN OUT YOUR COMPUTER
+
+
+
+
 
 #define PPM_Pin 3  //this must be 2 or 3
-#define PWM_channel_1 6
-#define PWM_channel_2 5
+#define steering_pin 6
+#define ESC_pin 5
 int ppm[16];  //array for storing up to 16 servo signals
 
 ServoTimer2 steering;
@@ -21,7 +32,7 @@ void setup()
   attachInterrupt(PPM_Pin - 2, read_ppm, CHANGE);
 
   //pinMode(PWM_channel_1, OUTPUT);
-  steering.attach(PWM_channel_1);
+  steering.attach(steering_pin);
   throttle.attach(PWM_channel_2);
 
   TCCR1A = 0;  //reset timer1
@@ -34,25 +45,25 @@ void loop()
   //You can delete everithing inside loop() and put your own code here
   int count;
 
-  while(ppm[count] != 0){  //print out the servo values
-    //Serial.print(ppm[count]);
-    //Serial.print("  ");
-    count++;
-  }
-  //Serial.println("");
+//  while(ppm[count] != 0){  //print out the servo values
+//    Serial.print(ppm[count]);
+//    Serial.print("  ");
+//    count++;
+//  }
+//  Serial.println("");
   delay(100);  //you can even use delays!!!
 
-  //int channel_1 = map(ppm[0], 990, 2015, 0, 255);
+//  int channel_1 = map(ppm[0], 990, 2015, 0, 255);
   int channel_1 = ppm[0];
   int channel_2 = ppm[1];
 
-  //analogWrite(PWM_channel_1, channel_1);
+//  analogWrite(PWM_channel_1, channel_1);
   steering.write(channel_1);
   throttle.write(channel_2);
-  Serial.println("");
-  Serial.print(channel_1);
-  Serial.print("   ");
-  Serial.print(channel_2);
+//  Serial.println("");
+//  Serial.print(channel_1);
+//  Serial.print("  ");
+//  Serial.print(channel_2);
 }
 
 
