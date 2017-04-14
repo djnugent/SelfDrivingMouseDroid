@@ -1,8 +1,14 @@
 #include "protocol.h"
+#include <ServoTimer2.h>
+
 
 //TODO
 // Easy encode and decode errors
 
+#define PPM_Pin 3  //this must be 2 or 3
+#define PWM_channel_1 6
+#define PWM_channel_2 5
+uint16_t ppm[16];  //array for storing up to 16 servo signals
 
 #define CHANNELS_IN_RATE 40 //hz
 
@@ -12,12 +18,36 @@ uint8_t errors = 0;
 long last_heartbeat_recv = 0;
 uint8_t mode = MODE_FAILSAFE;
 
+ServoTimer2 steering;
+ServoTimer2 throttle;
 
 void setup() {
   Serial.begin(115200);
+
+  pinMode(PPM_Pin, INPUT);
+  attachInterrupt(PPM_Pin - 2, read_ppm, CHANGE);
+
+  //pinMode(PWM_channel_1, OUTPUT);
+  steering.attach(PWM_channel_1);
+  throttle.attach(PWM_channel_2);
+
+  TCCR1A = 0;  //reset timer1
+  TCCR1B = 0;
+  TCCR1B |= (1 << CS11);  //set timer1 to increment every 0,5 us
 }
 
 void loop() {
+ 
+  uint16_t throttle_val = ppm[1];
+  uint16_t steering_val = ppm[0];
+  uint16_t aux1_val = ppm[2];
+  uint16_t aux2_val = ppm[3];
+  
+  send_vals(throttle_val, steering_val, aux1_val, aux2_val);
+
+  
+  steering.write(steering_val);
+  throttle.write(throttle_val);
 
   if((millis() - last_heartbeat_recv)/1000 > HEARTBEAT_TIMEOUT){
     connected = false;
@@ -26,8 +56,7 @@ void loop() {
   send_heartbeat();
 
   recv_msg();
-  
-  //send_channels_in();
+
 }
 
 void send_heartbeat(){
@@ -41,13 +70,14 @@ void send_heartbeat(){
   }
 }
 
-void send_channels_in(){
+void send_vals(uint16_t throttle_val, uint16_t steering_val, uint16_t aux1_val, uint16_t aux2_val){
   //store state between iterations
   static long last_channels_in_send = 0;
   
   //send at an interval
   if(millis() - last_channels_in_send > 1000/CHANNELS_IN_RATE){
-    send_channels_in(1000,1200,1300,2000);
+    send_channels_in(throttle_val,steering_val,aux1_val,aux2_val);
+    //send_debug(throttle_val,steering_val,aux1_val);
     last_channels_in_send = millis();
   }
 }
@@ -109,5 +139,27 @@ void recv_msg(){
       break;
     }
   }
+}
+
+void read_ppm(){  //leave this alone
+  static uint16_t pulse;
+  static uint32_t counter;
+  static uint8_t channel;
+
+  counter = TCNT1;
+  TCNT1 = 0;
+
+  if(counter < 1020){  //must be a pulse if less than 510us
+    pulse = counter;
+  }
+  else if(counter > 3820){  //sync pulses over 1910us
+    channel = 0;
+  }
+  else{  //servo values between 510us and 2420us will end up here
+    ppm[channel] = (counter + pulse)/2;
+    channel++;
+  }
+
+  
 }
 

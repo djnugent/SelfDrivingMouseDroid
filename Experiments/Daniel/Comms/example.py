@@ -6,7 +6,8 @@ if __name__ == '__main__':
         car = Car()
 
         #connect
-        car.connect(port="COM8")
+        car.connect(port="COM5")
+
         print("Waiting to hear from vehicle...")
 
         #wait to hear from vehicle
@@ -23,6 +24,9 @@ if __name__ == '__main__':
         print("Car is in auto mode")
 
         # Send control commands(currently designed to echo)
+        while True:
+            print(car.connected,car.channels_in)
+            time.sleep(0.1)
         print("Controlling vehicle")
         for i in range(0,1000,10):
             car.control(throttle=1000 + i,steering=2000+i, aux1=3000+i,aux2=4000+i)
@@ -34,7 +38,7 @@ if __name__ == '__main__':
         # print pending errors
         print("Showing errors")
         print(car.errors)
-
+        
     finally:
         #close connection
         car.close()
