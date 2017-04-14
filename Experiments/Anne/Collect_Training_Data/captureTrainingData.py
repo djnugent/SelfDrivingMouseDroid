@@ -58,7 +58,7 @@ if __name__ == "__main__" :
             #if cv2.waitKey(1) & 0xFF == ord('q'):
              #   break
 
-             time.sleep(.2);
+            time.sleep(.2)
 
     finally:
         print ("Done!")
