@@ -20,3 +20,5 @@ when running on flash drive need to do
 sudo sh <program>
 
 http://stackoverflow.com/questions/38120408/install-tensorflow-from-source
+
+https://github.com/scipy/scipy/blob/master/INSTALL.rst.txt
