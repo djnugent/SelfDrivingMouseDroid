@@ -6,9 +6,12 @@ if __name__ == "__main__" :
     
 
     # folder setup
-    folder = "training_data"
-    iteration = "1"
-    f = open(folder+ "/" + iteration + "/data.txt", 'w')
+    # folders contain 1s each, framerate is number of photos per folder
+    framerate = 64 # frames per minute
+    directory = "training_data" # directory this all ends up in
+    run_name = "1" # name describing this run
+    f = open(directory+ "/" + run_name + "/data.txt", 'w')
+    f = open(directory+ "/" + run_name + "/metadata.txt", 'w')
 
     # car setup
     car = Car()
@@ -25,14 +28,11 @@ if __name__ == "__main__" :
     count = 0
     success = True
 
-    #time_prev = time.time()
-    #images_per_second = 1 #change this!!
-    #time_span = 1 / images_per_second 
-
     try:
         while True:
-            #time_cur = time.time()
-            #if ((time_cur - time_prev) > time_span):
+
+            if count % framerate == 0:
+                sub = str(count % framerate);
                 
             success,image = cap.read()
 
@@ -41,22 +41,19 @@ if __name__ == "__main__" :
                 image = cv2.resize(image, (0,0), fx=0.5, fy=0.5) 
 
                 channels = car.channels_in;
-                steering_command = channels["steering"]
-                #steering_command = 0
+                steering_command = 0 #channels["steering"]
                 
                 print ('Read a new frame: ', count, steering_command)
 
-                #cv2.imshow("feed", image);
-                cv2.imwrite(folder+ "/" + iteration + "/%d.jpg" % count, image)
+                # cv2.imshow("feed", image);
+                cv2.imwrite(directory+ "/" + run_name + "/" + sub + "/%d.jpg" %count, image)
+                # change to datestamp and get rid of count?
+                # datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
                 f.write(str(steering_command) + " " + str(count) + ".jpg\n")
 
                 count += 1
 
-                #time_prev = time_cur;
-            
-            #if cv2.waitKey(1) & 0xFF == ord('q'):
-             #   break
 
             time.sleep(.2)
 
