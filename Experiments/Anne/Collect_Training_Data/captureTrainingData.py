@@ -3,7 +3,9 @@ import time
 
 from Car import Car
 if __name__ == "__main__" :
+
     
+
 
     # folder setup
     # folders contain 1s each, framerate is number of photos per folder
@@ -11,7 +13,23 @@ if __name__ == "__main__" :
     directory = "training_data" # directory this all ends up in
     run_name = "1" # name describing this run
     f = open(directory+ "/" + run_name + "/data.txt", 'w')
-    f = open(directory+ "/" + run_name + "/metadata.txt", 'w')
+    metadata = open(directory+ "/" + run_name + "/metadata.txt", 'w')
+
+    recorders = input('Who is capturing the data? ')
+    location = input('Where are you recording?')
+    framerate = input('What framerate are you using? ')
+    obstacles = input('Obstacles (low, med, high): ')
+    pedestrians = input('Pedestrians (low, med, high) ')
+    tags = input('Tags:')
+    notes = input('Any Notes: ')
+
+    metadata.write("Recorded by: " + recorders + "\n")
+    metadata.write("Location: " + location + "\n")
+    metadata.write("Framerate: " + framerate + "\n")
+    metadata.write("Obstacles: " + obstacles + "\n")
+    metadata.write("Pedestrians: " + pedestrians + "\n")
+    metadata.write("Tags: " + tags + "\n")
+    metadata.write("notes: " + notes + "\n")
 
     # car setup
     car = Car()
@@ -43,7 +61,7 @@ if __name__ == "__main__" :
                 channels = car.channels_in;
                 steering_command = 0 #channels["steering"]
                 
-                print ('Read a new frame: ', count, steering_command)
+                # print ('Read a new frame: ', count, steering_command)
 
                 # cv2.imshow("feed", image);
                 cv2.imwrite(directory+ "/" + run_name + "/" + sub + "/%d.jpg" %count, image)
