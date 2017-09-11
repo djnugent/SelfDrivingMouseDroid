@@ -6,11 +6,13 @@ import shutil
 
 from Car import Car
 if __name__ == "__main__" :
-    
+
+    print( "Collect Training Data - Autonomous Prime" )
+    print( "Please type information and press enter (simply press enter to stick to defaults or leave blank")
     directory = raw_input('Mapped Network Drive: (Default: Z:/training_data) ') or "Z:/training_data"
     recorders = raw_input('Who is capturing the data? ') or ""
     location =  raw_input('Where are you recording?') or ""
-    batch_size = int(raw_input('What batch size do you want? (Standard: 64) ') or 64)
+    batch_size = int(raw_input('What batch size do you want? (Default: 64) ') or 64)
     obstacles = raw_input('Obstacles (low, med, high): ') or ""
     pedestrians = raw_input('Pedestrians (low, med, high): ') or ""
     tags = raw_input('Tags (separated by commas): ') or ""
