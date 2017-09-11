@@ -7,8 +7,8 @@ import shutil
 from Car import Car
 if __name__ == "__main__" :
 
-    print( "Collect Training Data - Autonomous Prime" )
-    print( "Please type information and press enter (simply press enter to stick to defaults or leave blank")
+    print( " Autonomous Prime - Collect Training Data " )
+    print( " Please type information and press enter (simply press enter to stick to defaults or leave blank) ")
     directory = raw_input('Mapped Network Drive: (Default: Z:/training_data) ') or "Z:/training_data"
     recorders = raw_input('Who is capturing the data? ') or ""
     location =  raw_input('Where are you recording?') or ""
