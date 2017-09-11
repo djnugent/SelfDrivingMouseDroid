@@ -9,9 +9,10 @@ if __name__ == "__main__" :
 
     print( " Autonomous Prime - Collect Training Data " )
     print( " Please type information and press enter (simply press enter to stick to defaults or leave blank) ")
+
     directory = raw_input('Mapped Network Drive: (Default: Z:/training_data) ') or "Z:/training_data"
     recorders = raw_input('Who is capturing the data? ') or ""
-    location =  raw_input('Where are you recording?') or ""
+    location =  raw_input('Where are you recording? ') or ""
     batch_size = int(raw_input('What batch size do you want? (Default: 64) ') or 64)
     obstacles = raw_input('Obstacles (low, med, high): ') or ""
     pedestrians = raw_input('Pedestrians (low, med, high): ') or ""
@@ -34,12 +35,12 @@ if __name__ == "__main__" :
     metadata.write("Notes: " + notes + "\n")
 
     # car setup
-    #car = Car()
-    #car.connect(port="/dev/ttyACM0")
+    car = Car()
+    car.connect(port="/dev/ttyACM0")
     print("Waiting to hear from vehicle...")
 
-    #while(not car.connected):
-       # time.sleep(0.05)
+    while(not car.connected):
+        time.sleep(0.05)
     print("Car is connected!")
 
 
@@ -68,15 +69,13 @@ if __name__ == "__main__" :
 
                 image = cv2.resize(image, (0,0), fx=0.5, fy=0.5) 
 
-                #channels = car.channels_in;
-                steering_command = 0 #channels["steering"]
+                channels = car.channels_in;
+                steering_command = channels["steering"]
                 
                 # print ('Read a new frame: ', count, steering_command)
 
                 # cv2.imshow("feed", image);
                 cv2.imwrite(directory+ "/" + run_name + "/" + str(batch_num) + "/%d.jpg" %count, image)
-                # change to datestamp and get rid of count?
-                # datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
                 data.write(str(steering_command) + " " + str(count) + ".jpg\n")
 
@@ -95,7 +94,7 @@ if __name__ == "__main__" :
         
         print ("Done!")
         cap.release()
-        #car.close()
+        car.close()
         
         cv2.destroyAllWindows()
 
