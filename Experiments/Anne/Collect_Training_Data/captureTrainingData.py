@@ -52,13 +52,10 @@ if __name__ == "__main__" :
         while True:
 
             if count % batch_size == 0:
-                print ("count here: " + str(count))
                 if (count > 0) :
-                    print ("in if")
                     data.close()
                     batch_num += 1
                     count = 0
-                print ("Batch reached: " + str(batch_num) )
                 if not os.path.exists(directory + "/" + run_name + "/" + str(batch_num)):
                     os.makedirs(directory + "/" + run_name + "/" + str(batch_num))# name describing this run
                 data = open(directory + "/" + run_name + "/" + str(batch_num) + "/data.txt", 'w')
