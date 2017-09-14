@@ -26,13 +26,14 @@ if __name__ == "__main__" :
         os.makedirs(directory + "/" + run_name)# name describing this run
     metadata = open(directory+ "/" + run_name + "/metadata.txt", 'w') 
     
-    metadata.write("Recorded by: " + recorders + "\n")
-    metadata.write("Location: " + location + "\n")
-    metadata.write("Batch Size: " + str(batch_size) + "\n")
-    metadata.write("Obstacles: " + obstacles + "\n")
-    metadata.write("Pedestrians: " + pedestrians + "\n")
-    metadata.write("Tags: " + tags + "\n")
-    metadata.write("Notes: " + notes + "\n")
+    metadata.write(" Recorded by: " + recorders + "~")
+    metadata.write(" Location: " + location + "~")
+    metadata.write(" Batch Size: " + str(batch_size) + "~")
+    metadata.write(" Obstacles: " + obstacles + "~")
+    metadata.write(" Pedestrians: " + pedestrians + "~")
+    metadata.write(" Tags: " + tags + "~")
+    metadata.write(" Notes: " + notes + "~")
+    metadata.write(" Date: " + run_name + "~")
 
     # car setup
     car = Car()
