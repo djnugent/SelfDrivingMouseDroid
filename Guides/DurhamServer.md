@@ -5,10 +5,10 @@ The durham server contains a Titan X which is the most powerful GPU we have. Mul
 1. ssh into the machine `ssh net-id@du310-06.ece.iastate.edu`
   * Make sure you are on the iastate VPN if not on campus
   * Replace net-id with your id
-2. Install keras/tensorflow/opencv locally run, `pip3 install --user opencv-python keras tensorflow-gpu`
+2. Install keras/tensorflow/opencv/flash locally run, `pip3 install --user flask opencv-python==3.1.0 keras==1.2.2 tensorflow-gpu==1.0.1`
   * Only need to install once.
 3. Set up environment variable, run `source cuda_bash.sh` or `source cuda_tcsh.sh`
   * Only one will work. You just have to try both
   * The source file can be found in this directory
-4. Run your python code!!ls
+4. Run your python code!!
 5. exit the ssh session `exit`
