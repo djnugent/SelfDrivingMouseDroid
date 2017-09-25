@@ -1,7 +1,8 @@
 Collect Training Data
 
 1) Mount the network drive locally 
-    \\h01.ece.iastate.edu\ecpeprime on Windows
+    "\\h01.ece.iastate.edu\ecpeprime"
+    netid@iastate.edu, your password 
     
 2) Download the scripts from this folder
 
