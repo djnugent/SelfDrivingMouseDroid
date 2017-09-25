@@ -10,7 +10,7 @@ if __name__ == "__main__" :
     print( " Autonomous Prime - Collect Training Data " )
     print( " Please type information and press enter (simply press enter to stick to defaults or leave blank) ")
 
-    directory = raw_input('Mapped Network Drive: (Default: Z:/training_data) ') or "Z:/training_data"
+    directory = raw_input('Mapped Network Drive: (Default: \\h01.ece.iastate.edu/ecpeprime/training_data) ') or "//h01.ece.iastate.edu/ecpeprime/training_data"
     recorders = raw_input('Who is capturing the data? ') or ""
     location =  raw_input('Where are you recording? ') or ""
     batch_size = int(raw_input('What batch size do you want? (Default: 64) ') or 64)
@@ -36,12 +36,12 @@ if __name__ == "__main__" :
     metadata.write(" Date: " + run_name + "~")
 
     # car setup
-    car = Car()
-    car.connect(port="/dev/ttyACM0")
+    #car = Car()
+    #car.connect(port="/dev/ttyACM0")
     print("Waiting to hear from vehicle...")
 
-    while(not car.connected):
-        time.sleep(0.05)
+    #while(not car.connected):
+     #   time.sleep(0.05)
     print("Car is connected!")
 
 
@@ -70,8 +70,8 @@ if __name__ == "__main__" :
 
                 image = cv2.resize(image, (0,0), fx=0.5, fy=0.5) 
 
-                channels = car.channels_in;
-                steering_command = channels["steering"]
+                #channels = car.channels_in;
+                steering_command = 0# channels["steering"]
                 
                 # print ('Read a new frame: ', count, steering_command)
 
@@ -95,7 +95,7 @@ if __name__ == "__main__" :
         
         print ("Done!")
         cap.release()
-        car.close()
+        #car.close()
         
         cv2.destroyAllWindows()
 
