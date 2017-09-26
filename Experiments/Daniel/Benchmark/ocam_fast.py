@@ -1,5 +1,5 @@
 import multiprocessing
-import oCam
+import ocam
 
 class Camera:
 
@@ -31,7 +31,7 @@ class Camera:
 
         while True:
             # constantly get the image from the camera
-            latest_image = camera.GetFrame()
+            latest_image = self.camera.GetFrame()
 
             # check if the parent wants the image
             if imgcap_connection.poll():
