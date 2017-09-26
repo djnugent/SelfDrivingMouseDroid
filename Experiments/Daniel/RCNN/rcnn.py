@@ -41,4 +41,5 @@ while True:
 
     img = np.zeros((rows,cols,1))
     start = time.time()
+    model.predict(img[None,None,:,:,:])
     print("fps: ", 1.0/(time.time()-start))
