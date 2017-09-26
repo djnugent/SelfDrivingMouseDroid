@@ -9,6 +9,11 @@ from keras.optimizers import Adam
 import numpy as np
 import time
 
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
+config = tf.ConfigProto(intra_op_parallelism_threads=8,inter_op_parallelism_threads=8)
+set_session(tf.Session(config=config))
+
 print("\nBuilding and compiling the model ...")
 
 num_seq =1
