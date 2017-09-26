@@ -45,16 +45,18 @@ class Camera:
 
     # close - closes the camera
     def close(self):
-        # release camera when exiting
-        self.camera.stop()
-        self.camera.close()
 
         #Clean up when exitting background capture
         if(self.background_capture):
+            print("closing processes")
             # send exit command to image capture process
             self.parent_conn.send(Camera.EXIT)
             # join process
             self.proc.join()
+        # release camera when exiting
+        print("closing camera")
+        self.camera.stop()
+        self.camera.close()
 
     # open - starts the camera(and possibly background capture)
     def open(self):
