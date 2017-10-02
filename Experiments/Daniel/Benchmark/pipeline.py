@@ -8,18 +8,15 @@ from keras.layers.noise import GaussianNoise
 from keras.optimizers import Adam
 import numpy as np
 import time
-
-import tensorflow as tf
-from keras.backend.tensorflow_backend import set_session
-config = tf.ConfigProto(intra_op_parallelism_threads=8,inter_op_parallelism_threads=8)
-set_session(tf.Session(config=config))
+from ocam_fast import Camera
+import cv2
 
 print("\nBuilding and compiling the model ...")
 
 num_seq =1
 seq_len = None
-rows = 200
-cols= 100
+rows = 150
+cols= 300
 num_chan = 1
 
 model = Sequential()
@@ -42,9 +39,30 @@ model.add(Dropout(0.5))
 model.add(Dense(1, name='output'))
 model.summary()
 
+
+cam = Camera(background_capture = False)
 while True:
 
-    img = np.zeros((rows,cols,1))
+    # crop
     start = time.time()
-    model.predict(img[None,None,:,:,:])
-    print("fps: ", 1.0/(time.time()-start))
+    ret,img = cam.read()
+    crop = img[:rows,:cols]
+    model.predict(crop[None,None,:,:,:])
+    crop_fps = 1.0/(time.time()-start)
+
+    # resize
+    start = time.time()
+    ret,img = cam.read()
+    resize = cv2.resize(img,(cols,rows), interpolation = cv2.INTER_AREA)[:,:,None]
+    model.predict(resize[None,None,:,:,:])
+    resize_fps = 1.0/(time.time()-start)
+
+    # both
+    start = time.time()
+    ret,img = cam.read()
+    img = img[:500,:500]
+    resize = cv2.resize(img,(cols,rows), interpolation = cv2.INTER_AREA)[:,:,None]
+    model.predict(resize[None,None,:,:,:])
+    both_fps = 1.0/(time.time()-start)
+
+    print("crop fps: ", crop_fps, "resize fps", resize_fps, "both", both_fps)
