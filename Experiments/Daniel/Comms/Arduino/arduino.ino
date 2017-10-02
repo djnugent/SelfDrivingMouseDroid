@@ -18,47 +18,58 @@ uint8_t errors = 0;
 long last_heartbeat_recv = 0;
 uint8_t mode = MODE_FAILSAFE;
 
+// Setup our pwm outputs
 ServoTimer2 steering;
 ServoTimer2 throttle;
 
 void setup() {
+  // Open serial connection at baudrate 115200
   Serial.begin(115200);
 
+  // Open PPM interrupt pin
   pinMode(PPM_Pin, INPUT);
   attachInterrupt(PPM_Pin - 2, read_ppm, CHANGE);
 
-  //pinMode(PWM_channel_1, OUTPUT);
+  // Start PWM output
   steering.attach(PWM_channel_1);
   throttle.attach(PWM_channel_2);
 
+  // timer1 stuff for PPM decode
   TCCR1A = 0;  //reset timer1
   TCCR1B = 0;
   TCCR1B |= (1 << CS11);  //set timer1 to increment every 0,5 us
 }
 
 void loop() {
- 
+
+  // Extract pulse data from global ppm array
   uint16_t throttle_val = ppm[1];
   uint16_t steering_val = ppm[0];
   uint16_t aux1_val = ppm[2];
   uint16_t aux2_val = ppm[3];
-  
+
+  // Send those values to odroid
   send_vals(throttle_val, steering_val, aux1_val, aux2_val);
 
-  
+  // Update PWM output
   steering.write(steering_val);
   throttle.write(throttle_val);
 
+  // Check if odroid is still responding
   if((millis() - last_heartbeat_recv)/1000 > HEARTBEAT_TIMEOUT){
     connected = false;
   }
 
+  // Send a heartbeat to odroid
   send_heartbeat();
 
+  // Decode any messages sent from the odroid
   recv_msg();
 
 }
 
+
+// Wrapper function to send heartbeat at a fixed rate
 void send_heartbeat(){
   //store state between iterations
   static long last_heartbeat_send = 0;
@@ -70,6 +81,7 @@ void send_heartbeat(){
   }
 }
 
+// Wrapper function to send RC vals at a fixed rate
 void send_vals(uint16_t throttle_val, uint16_t steering_val, uint16_t aux1_val, uint16_t aux2_val){
   //store state between iterations
   static long last_channels_in_send = 0;
@@ -82,12 +94,13 @@ void send_vals(uint16_t throttle_val, uint16_t steering_val, uint16_t aux1_val, 
   }
 }
 
-
+// Handler function to receive heartbeat
 void handle_heartbeat(uint8_t* payload){
   connected = true;
   last_heartbeat_recv = millis();
 }
 
+// Handler function to receive Control values
 void handle_control(uint8_t* payload){
   msg_control_t control;
   decode_control(payload,&control);
@@ -97,12 +110,14 @@ void handle_control(uint8_t* payload){
   send_channels_in(control.throttle,control.steering,control.aux1,control.aux2);
 }
 
+// Handler function to receive setmode values
 void handle_set_mode(uint8_t* payload){
   msg_set_mode_t msg;
   decode_set_mode(payload,&msg);
   mode = msg.mode;
 }
 
+// Receive function to handle incoming packets
 void recv_msg(){
   byte payload[32];
   static int dropped = 0;
@@ -141,6 +156,8 @@ void recv_msg(){
   }
 }
 
+
+// interrupt routine to read PPM
 void read_ppm(){  //leave this alone
   static uint16_t pulse;
   static uint32_t counter;
