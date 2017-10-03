@@ -4,6 +4,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Dropout
 from keras.utils import np_utils
+from keras.models import load_model
 
 # fix random seed for reproducibility
 seed = 7
@@ -43,3 +44,6 @@ model.fit(X_train, y_train, validation_data=(X_test, y_test), nb_epoch=10, batch
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test, verbose=0)
 print("Baseline Error: %.2f%%" % (100-scores[1]*100))
+
+#Save the model
+model.save('baseline_model.h5')
