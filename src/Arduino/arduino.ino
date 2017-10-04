@@ -43,10 +43,12 @@ void setup() {
 void loop() {
 
   // Extract pulse data from global ppm array
-  uint16_t throttle_val = ppm[1];
-  uint16_t steering_val = ppm[0];
-  uint16_t aux1_val = ppm[4]; // Left  Switch -- Up   = Low
-  uint16_t aux2_val = ppm[5]; // Right Switch -- Down = High
+  uint16_t throttle_val = 1500 + ((ppm[1] - 1500) / 5);
+  uint16_t steering_val = 1500 + ((ppm[0] - 1500) / 5);
+  // PPM SIGNALS BELOW ARE THE SWITCHES
+  // UP = LOW   DOWN = HIGH
+  uint16_t aux1_val = ppm[4]; // Left  Switch -- Mode Switch
+  uint16_t aux2_val = ppm[5]; // Right Switch -- Unused
 
   // Send those values to odroid
   send_vals(throttle_val, steering_val, aux1_val, aux2_val);
@@ -65,6 +67,24 @@ void loop() {
 
   // Decode any messages sent from the odroid
   recv_msg();
+
+  if (aux1_val < 1100) {
+    mode = MODE_MANUAL;
+  } else if (aux1_val > 1900) {
+    mode = MODE_AUTOMATIC;
+  } else {
+    mode = MODE_FAILSAFE;
+  }
+
+  if (mode = MODE_FAILSAFE) {
+    steering.write(1500);
+    throttle.write(1500);
+  } else if (mode = MODE_MANUAL) {
+    steering.write(steering_val);
+    throttle.write(throttle_val);
+  } else if (mode = MODE_AUTOMATIC){
+    
+  }
 
 }
 
