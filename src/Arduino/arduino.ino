@@ -45,8 +45,8 @@ void loop() {
   // Extract pulse data from global ppm array
   uint16_t throttle_val = ppm[1];
   uint16_t steering_val = ppm[0];
-  uint16_t aux1_val = ppm[2];
-  uint16_t aux2_val = ppm[3];
+  uint16_t aux1_val = ppm[4]; // Left  Switch -- Up   = Low
+  uint16_t aux2_val = ppm[5]; // Right Switch -- Down = High
 
   // Send those values to odroid
   send_vals(throttle_val, steering_val, aux1_val, aux2_val);
