@@ -5,18 +5,29 @@
 //TODO
 // Easy encode and decode errors
 
+// Pin definitions
 #define PPM_Pin 3  //this must be 2 or 3
 #define PWM_channel_1 6
 #define PWM_channel_2 5
+
+// Channel Defintions
+#define steering_channel 0 // l/r RIGHT STICK
+#define throttle_channel 1 // up/dwn RIGHT STICK
+#define mode_channel 5     // RIGHT SWITCH
+#define aux1_channel 4     // LEFT SWITCH
+#define aux2 channel 7     // MIDDLE SWITCH
+
 uint16_t ppm[16];  //array for storing up to 16 servo signals
 
 #define CHANNELS_IN_RATE 40 //hz
 
-//state variables
-bool connected = false;
+// Global state variables
+bool odroid_connected = false;
+bool RC_connected = false;
 uint8_t errors = 0;
 long last_heartbeat_recv = 0;
 uint8_t mode = MODE_FAILSAFE;
+uint16_t last_mode_us = 0;
 
 // Setup our pwm outputs
 ServoTimer2 steering;
@@ -42,25 +53,27 @@ void setup() {
 
 void loop() {
 
-  // Extract pulse data from global ppm array
+  // Extract and modify pulse data from global ppm array
   uint16_t throttle_val = 1500 + ((ppm[1] - 1500) / 5);
-  uint16_t steering_val = 1500 + ((ppm[0] - 1500) / 5);
+  uint16_t steering_val = ppm[0];
   // PPM SIGNALS BELOW ARE THE SWITCHES
   // UP = LOW   DOWN = HIGH
   uint16_t aux1_val = ppm[4]; // Left  Switch -- Mode Switch
-  uint16_t aux2_val = ppm[5]; // Right Switch -- Unused
+  uint16_t aux2_val = ppm[5]; // Right Switch -- 
 
   // Send those values to odroid
   send_vals(throttle_val, steering_val, aux1_val, aux2_val);
 
   // Update PWM output
-  steering.write(steering_val);
-  throttle.write(throttle_val);
+  //steering.write(steering_val);
+  //throttle.write(throttle_val);
 
   // Check if odroid is still responding
   if((millis() - last_heartbeat_recv)/1000 > HEARTBEAT_TIMEOUT){
-    connected = false;
+    odroid_connected = false;
   }
+  detect_RC();
+  
 
   // Send a heartbeat to odroid
   send_heartbeat();
@@ -71,7 +84,7 @@ void loop() {
   if (aux1_val < 1100) {
     mode = MODE_MANUAL;
   } else if (aux1_val > 1900) {
-    mode = MODE_AUTOMATIC;
+    mode = MODE_AUTO;
   } else {
     mode = MODE_FAILSAFE;
   }
@@ -88,35 +101,51 @@ void loop() {
 
 }
 
-
-// Wrapper function to send heartbeat at a fixed rate
-void send_heartbeat(){
-  //store state between iterations
-  static long last_heartbeat_send = 0;
-  
-  //send at an interval
-  if(millis() - last_heartbeat_send > 1000/HEARTBEAT_RATE){
-    send_heartbeat(mode,errors);
-    last_heartbeat_send = millis();
+// Change mode using RC switch
+// But only rising and falling edges, not levels. 
+// That way we don't override system failsafes
+void check_mode_change(uint8_t mode_channel){
+  uint8_t us_thresh = 490;
+  uint16_t current_mode_us = ppm[mode_channel];
+  // Check for rising or falling edge
+  if(abs(current_mode_us - last_mode_us) > us_thresh){
+    current_mode_us = ppm[mode_channel];
+    // Auto
+    if(current_mode_us > 1900){
+      mode = MODE_AUTO;
+    }
+    // Manual
+    else if(current_mode_us > 1400){
+      mode = MODE_MANUAL;
+    }
+    // Failsafe
+    else{
+      mode = MODE_FAILSAFE
+    }
+    last_mode_us = ppm[mode_channel];
   }
 }
 
-// Wrapper function to send RC vals at a fixed rate
-void send_vals(uint16_t throttle_val, uint16_t steering_val, uint16_t aux1_val, uint16_t aux2_val){
-  //store state between iterations
-  static long last_channels_in_send = 0;
-  
-  //send at an interval
-  if(millis() - last_channels_in_send > 1000/CHANNELS_IN_RATE){
-    send_channels_in(throttle_val,steering_val,aux1_val,aux2_val);
-    //send_debug(throttle_val,steering_val,aux1_val);
-    last_channels_in_send = millis();
+// Check if odroid is still responding
+void detect_odroid(){
+  if((millis() - last_heartbeat_recv)/1000 > HEARTBEAT_TIMEOUT){
+    odroid_connected = false;
+  }
+}
+
+// Check if RC Controller is sending signals
+void detect_RC() {
+  if (ppm[1] < 930) {
+    RC_connected = false;
+  }
+  else {
+    RC_connected = true;
   }
 }
 
 // Handler function to receive heartbeat
 void handle_heartbeat(uint8_t* payload){
-  connected = true;
+  odroid_connected = true;
   last_heartbeat_recv = millis();
 }
 
@@ -176,7 +205,6 @@ void recv_msg(){
   }
 }
 
-
 // interrupt routine to read PPM
 void read_ppm(){  //leave this alone
   static uint16_t pulse;
@@ -196,7 +224,30 @@ void read_ppm(){  //leave this alone
     ppm[channel] = (counter + pulse)/2;
     channel++;
   }
-
   
 }
 
+// Wrapper function to send heartbeat at a fixed rate
+void send_heartbeat(){
+  //store state between iterations
+  static long last_heartbeat_send = 0;
+  
+  //send at an interval
+  if(millis() - last_heartbeat_send > 1000/HEARTBEAT_RATE){
+    send_heartbeat(mode,errors);
+    last_heartbeat_send = millis();
+  }
+}
+
+// Wrapper function to send RC vals at a fixed rate
+void send_vals(uint16_t throttle_val, uint16_t steering_val, uint16_t aux1_val, uint16_t aux2_val){
+  //store state between iterations
+  static long last_channels_in_send = 0;
+  
+  //send at an interval
+  if(millis() - last_channels_in_send > 1000/CHANNELS_IN_RATE){
+    send_channels_in(throttle_val,steering_val,aux1_val,aux2_val);
+    //send_debug(throttle_val,steering_val,aux1_val);
+    last_channels_in_send = millis();
+  }
+}
