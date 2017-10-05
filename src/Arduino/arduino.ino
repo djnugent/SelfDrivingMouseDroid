@@ -28,6 +28,10 @@ uint8_t errors = 0;
 long last_heartbeat_recv = 0;
 uint8_t mode = MODE_FAILSAFE;
 uint16_t last_mode_us = 0;
+uint16_t auto_steering_val = 1500;
+uint16_t auto_throttle_val = 1500;
+uint16_t auto_aux1_val = 1000;
+uint16_t auto_aux2_val = 1000;
 
 // Setup our pwm outputs
 ServoTimer2 steering;
@@ -54,49 +58,39 @@ void setup() {
 void loop() {
 
   // Extract and modify pulse data from global ppm array
-  uint16_t throttle_val = 1500 + ((ppm[1] - 1500) / 5);
-  uint16_t steering_val = ppm[0];
-  // PPM SIGNALS BELOW ARE THE SWITCHES
-  // UP = LOW   DOWN = HIGH
-  uint16_t aux1_val = ppm[4]; // Left  Switch -- Mode Switch
-  uint16_t aux2_val = ppm[5]; // Right Switch -- 
-
-  // Send those values to odroid
-  send_vals(throttle_val, steering_val, aux1_val, aux2_val);
-
-  // Update PWM output
-  //steering.write(steering_val);
-  //throttle.write(throttle_val);
-
-  // Check if odroid is still responding
-  if((millis() - last_heartbeat_recv)/1000 > HEARTBEAT_TIMEOUT){
-    odroid_connected = false;
-  }
-  detect_RC();
+  uint16_t throttle_val = 1500 + ((ppm[throttle_channel] - 1500) * throttle_scale);
+  uint16_t steering_val = ppm[steering_channel];
+  uint16_t aux1_val = ppm[aux1_channel];
+  uint16_t aux2_val = ppm[aux2_channel];
   
-
   // Send a heartbeat to odroid
   send_heartbeat();
+  
+  // Send values to odroid
+  send_vals(throttle_val, steering_val, aux1_val, aux2_val);
+
+  // Check for RC and Odroid Conntection
+  detect_RC();
+  detect_odriod();
 
   // Decode any messages sent from the odroid
   recv_msg();
 
-  if (aux1_val < 1100) {
-    mode = MODE_MANUAL;
-  } else if (aux1_val > 1900) {
-    mode = MODE_AUTO;
-  } else {
-    mode = MODE_FAILSAFE;
-  }
+  check_mode_change();
 
-  if (mode = MODE_FAILSAFE) {
+  if ((!odroid_connected && mode == MODE_AUTO) || !RC_connected) {
+    mode = MODE_FAILSAFE;  
+  }
+  
+  if (mode == MODE_FAILSAFE) {
     steering.write(1500);
     throttle.write(1500);
-  } else if (mode = MODE_MANUAL) {
+  } else if (mode == MODE_MANUAL) {
     steering.write(steering_val);
     throttle.write(throttle_val);
-  } else if (mode = MODE_AUTOMATIC){
-    
+  } else if (mode == MODE_AUTOMATIC){
+    steering.write(auto_steering_val);
+    throttle.write(throttle_val);   // NOT USING AUTO THROTTLE
   }
 
 }
@@ -104,7 +98,7 @@ void loop() {
 // Change mode using RC switch
 // But only rising and falling edges, not levels. 
 // That way we don't override system failsafes
-void check_mode_change(uint8_t mode_channel){
+void check_mode_change(){
   uint8_t us_thresh = 490;
   uint16_t current_mode_us = ppm[mode_channel];
   // Check for rising or falling edge
@@ -113,6 +107,8 @@ void check_mode_change(uint8_t mode_channel){
     // Auto
     if(current_mode_us > 1900){
       mode = MODE_AUTO;
+      auto_steering_val = 1500;
+      auto_throttle_val = 1500;
     }
     // Manual
     else if(current_mode_us > 1400){
@@ -157,13 +153,18 @@ void handle_control(uint8_t* payload){
   //echo it back as a channels_in msg
   //send_debug(control.throttle,control.steering,control.aux1);
   send_channels_in(control.throttle,control.steering,control.aux1,control.aux2);
+
+  auto_steering_val = control.steering;
+  auto_throttle_val = control.throttle;
+  auto_aux1_val = control.aux1;
+  auto_aux2_val = control.aux2;
 }
 
 // Handler function to receive setmode values
 void handle_set_mode(uint8_t* payload){
   msg_set_mode_t msg;
   decode_set_mode(payload,&msg);
-  mode = msg.mode;
+  //mode = msg.mode;
 }
 
 // Receive function to handle incoming packets
