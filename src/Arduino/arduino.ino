@@ -1,5 +1,5 @@
 #include "protocol.h"
-#include <ServoTimer2.h>
+#include "ServoTimer2.h"
 
 
 //TODO
@@ -15,13 +15,14 @@
 #define throttle_channel 1 // up/dwn RIGHT STICK
 #define mode_channel 5     // RIGHT SWITCH
 #define aux1_channel 4     // LEFT SWITCH
-#define aux2 channel 7     // MIDDLE SWITCH
+#define aux2_channel 7     // MIDDLE SWITCH
 
 uint16_t ppm[16];  //array for storing up to 16 servo signals
 
 #define CHANNELS_IN_RATE 40 //hz
 
 // Global state variables
+float throttle_scale = 0.2;
 bool odroid_connected = false;
 bool RC_connected = false;
 uint8_t errors = 0;
@@ -58,7 +59,7 @@ void setup() {
 void loop() {
 
   // Extract and modify pulse data from global ppm array
-  uint16_t throttle_val = 1500 + ((ppm[throttle_channel] - 1500) * throttle_scale);
+  uint16_t throttle_val = (uint16_t) (1500 + ((ppm[throttle_channel] - 1500) * throttle_scale));
   uint16_t steering_val = ppm[steering_channel];
   uint16_t aux1_val = ppm[aux1_channel];
   uint16_t aux2_val = ppm[aux2_channel];
@@ -71,7 +72,7 @@ void loop() {
 
   // Check for RC and Odroid Conntection
   detect_RC();
-  detect_odriod();
+  detect_odroid();
 
   // Decode any messages sent from the odroid
   recv_msg();
@@ -88,7 +89,7 @@ void loop() {
   } else if (mode == MODE_MANUAL) {
     steering.write(steering_val);
     throttle.write(throttle_val);
-  } else if (mode == MODE_AUTOMATIC){
+  } else if (mode == MODE_AUTO){
     steering.write(auto_steering_val);
     throttle.write(throttle_val);   // NOT USING AUTO THROTTLE
   }
@@ -99,7 +100,7 @@ void loop() {
 // But only rising and falling edges, not levels. 
 // That way we don't override system failsafes
 void check_mode_change(){
-  uint8_t us_thresh = 490;
+  uint16_t us_thresh = 490;
   uint16_t current_mode_us = ppm[mode_channel];
   // Check for rising or falling edge
   if(abs(current_mode_us - last_mode_us) > us_thresh){
@@ -116,7 +117,7 @@ void check_mode_change(){
     }
     // Failsafe
     else{
-      mode = MODE_FAILSAFE
+      mode = MODE_FAILSAFE;
     }
     last_mode_us = ppm[mode_channel];
   }
