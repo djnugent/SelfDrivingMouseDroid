@@ -1,9 +1,59 @@
-.inputs p {
-  padding: 5px;
+
+/*
+font-family: 'Ubuntu Condensed', sans-serif;
+font-family: 'Play', sans-serif;
+font-family: 'Exo', sans-serif;
+font-family: 'Monda', sans-serif;
+
+
+h1 {
+  font-family: 'Ubuntu Condensed', sans-serif;
+	font-size: 24px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 500;
+	line-height: 26.4px;
+}
+h2 {
+	font-family: 'Ubuntu Condensed', sans-serif;
+	font-size: 14px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 500;
+	line-height: 15.4px;
+}
+p {
+	font-family: 'Ubuntu Condensed', sans-serif;
+	font-size: 14px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 20px;
 }
 
-.inputs p .notes {
-  width:300px;
-  height:100px;
-  vertical-align: text-top;
+*/
+
+
+body {
+font-family: 'Monda', sans-serif;
+color: #4f4f4f;
+}
+
+.title {
+
+  background: linear-gradient(to right, #f7c97e 0%, #f4af3f 100%);
+
+  border-bottom: thick solid #aaa;
+
+  color:#fff9e5;
+  text-shadow: 4px 4px 4px #aaa;
+
+  text-align: right;
+  padding: 20px;
+  padding-right: 80px;
+}
+
+.content h2 {
+  padding:20px;
+
 }
