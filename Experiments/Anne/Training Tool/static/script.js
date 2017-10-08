@@ -62,9 +62,54 @@ app.controller('ctrl', function($scope, $location, $http, $rootScope, $filter, $
 	})
 }
 
+ $scope.initGraph = function() {
+var results = {};
+results.loss = [10, 10, 15, 16, 20, 25, 40, 55, 70, 78, 87, 92, 99, 100];
+var ctxLineGraph = $("#lineGraph").get(0).getContext("2d");
+
+// if (lineGraph != null) {
+// 	console.log("destroying chart!");
+// 	lineGraph.destroy();
+// }
+
+lineGraph = new Chart(ctxLineGraph, {
+		type: 'line',
+		data: {
+				labels:results.loss ,
+				datasets: [/*{ HERE if you want multiple data sets on same graph
+						label: 'Speed',
+						data: ride.speed,
+						backgroundColor: '#54997E',
+						borderWidth: 1
+				},*/
+				{
+					label: 'Loss',
+					data: results.loss,
+					backgroundColor: '#ffe2b5',
+					borderWidth: 1
+			}]
+		},
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+				scales: {
+						yAxes: [{
+								ticks: {
+										beginAtZero:true
+								}
+						}]
+				}
+		}
+
+});
+}
+
+
+/*
+
 $scope.fetchData = function() {
   $scope.data.training_data = [];
-  
+
   // Check for the various File API support.
   if (window.File && window.FileReader && window.FileList && window.Blob) {
   } else {
@@ -149,6 +194,6 @@ $scope.fetchData = function() {
 $scope.run = function() {
   console.log("running");
 
-}
+}*/
 
 });
