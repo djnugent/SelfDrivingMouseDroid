@@ -3,7 +3,7 @@
 <head>
 <title>CNN Data Management</title>
 
-
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='neural_net_icon.png') }}"/>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
@@ -23,9 +23,7 @@
 <link rel="stylesheet" type="text/css" href="static/style.css">
 
 <script type="text/javascript">
-//metadata = '{{metadata|tojson}}';
-//console.log(metadata);
-//initData({{metadata|tojson}});
+initData({{data|tojson}});
 </script>
 
 
