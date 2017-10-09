@@ -1,5 +1,5 @@
 function initData(metadata) {
-//	console.log(metadata);
+	//console.log(metadata);
 	window.metadata = metadata;
 }
 
@@ -46,6 +46,7 @@ app.controller('ctrl', function($scope, $location, $http, $rootScope, $filter, $
 	})
 	.done(function(result) {
 		console.log(result);
+		$window.location.reload();
 	 })
 }
 
@@ -64,7 +65,9 @@ app.controller('ctrl', function($scope, $location, $http, $rootScope, $filter, $
 
  $scope.initGraph = function() {
 var results = {};
-results.loss = [10, 10, 15, 16, 20, 25, 40, 55, 70, 78, 87, 92, 99, 100];
+results.loss = $window.metadata;
+console.log($window.metadata);
+//results.loss = [10, 10, 15, 16, 20, 25, 40, 55, 70, 78, 87, 92, 99, 100];
 var ctxLineGraph = $("#lineGraph").get(0).getContext("2d");
 
 // if (lineGraph != null) {
@@ -102,6 +105,10 @@ lineGraph = new Chart(ctxLineGraph, {
 		}
 
 });
+
+setInterval(function() {
+$window.location.reload();
+}, 10000);
 }
 
 
