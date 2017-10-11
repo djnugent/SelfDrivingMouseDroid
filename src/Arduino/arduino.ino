@@ -23,7 +23,6 @@ uint16_t ppm[16];  //array for storing up to 16 servo signals
 
 // Global state variables
 float throttle_scale = 0.2;
-bool odroid_connected = false;
 bool RC_connected = false;
 uint8_t errors = 0;
 long last_heartbeat_recv = 0;
@@ -59,14 +58,14 @@ void setup() {
 void loop() {
 
   // Extract and modify pulse data from global ppm array
-  uint16_t throttle_val = (uint16_t) (1500 + ((ppm[throttle_channel] - 1500) * throttle_scale));
+  uint16_t throttle_val = (uint16_t) (1500 + (((float) (ppm[throttle_channel]) - 1500) * throttle_scale));
   uint16_t steering_val = ppm[steering_channel];
   uint16_t aux1_val = ppm[aux1_channel];
   uint16_t aux2_val = ppm[aux2_channel];
   
   // Send a heartbeat to odroid
   send_heartbeat();
-  
+
   // Send values to odroid
   send_vals(throttle_val, steering_val, aux1_val, aux2_val);
 
@@ -110,6 +109,8 @@ void check_mode_change(){
       mode = MODE_AUTO;
       auto_steering_val = 1500;
       auto_throttle_val = 1500;
+      auto_aux1_val = 1500;
+      auto_aux2_val = 1500;
     }
     // Manual
     else if(current_mode_us > 1400){

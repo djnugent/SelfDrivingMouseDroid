@@ -20,9 +20,9 @@ def index():
     """ Displays the index page accessible at '/'
     """
     if (len(resultNumbers) > 0):
-        return flask.render_template('index0.html', metadata = resultNumbers)
+        return flask.render_template('index0.html', data = resultNumbers)
     else:
-        return flask.render_template('index.html', metadata = metadata)
+        return flask.render_template('index.html', data = metadata)
 
 
 @APP.route('/train', methods=['POST'])
@@ -35,14 +35,7 @@ def train():
                print(data)
         trainingThread = threading.Thread(target = trainOn, args=(), kwargs={'trainingDatasets':content['trainingDatasets'], 'resultNumbers':resultNumbers})
         trainingThread.start()
-
-        currentlyTraining = True
-        return json.dumps({'status':'OK'})
-
-@APP.route('/refetch', methods=['POST'])
-def refetch():
-        return json.dumps({'latest result':resultNumbers[-1]})
-
+        return json.dumps({"status":"ok"})
 
 if __name__ == "__main__":
 	APP.run(host="0.0.0.0", port="8080")
