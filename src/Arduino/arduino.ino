@@ -23,6 +23,7 @@ uint16_t ppm[16];  //array for storing up to 16 servo signals
 
 // Global state variables
 float throttle_scale = 0.2;
+bool odroid_connected = false;
 bool RC_connected = false;
 uint8_t errors = 0;
 long last_heartbeat_recv = 0;
