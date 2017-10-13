@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CNN Data Management</title>
+
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='neural_net_icon.png') }}"/>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<link href="https://fonts.googleapis.com/css?family=Exo|Monda|Play|Ubuntu+Condensed" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+<script type="text/javascript">
+initData({{data|tojson}});
+</script>
+
+</head>
+<body ng-app="app" ng-controller="ctrl" ng-init="initMetadata()">
+
+
+<div class="title">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>Convolutional Neural Network</h1>
+      <h2>Training and Data Management Tool</h2>
+    </div>
+  </div>
+</div>
+
+<div class="row content">
+  <div class="col-md-10 col-md-offset-1">
+  <h2>Train the Network</h2>
+
+<div id="table">
+  <form hidden>
+    	<div class="form-group">
+    		<div class="input-group">
+        		<div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+        		<input type="text" class="form-control" placeholder="Search Training Data" ng-model="searchData">
+      		</div>
+    	</div>
+  	</form>
+
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Selection</th>
+        <th><a ng-click="sortType = 'location'; sortReverse = !sortReverse;">
+                Location
+                <span ng-show="sortType == 'location' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'location' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th><a ng-click="sortType = 'recordedBy'; sortReverse = !sortReverse">
+                Recorded By
+                <span ng-show="sortType == 'recordedBy' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'recordedBy' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th><a ng-click="sortType = 'date'; sortReverse = !sortReverse">
+                Date
+                <span ng-show="sortType == 'date' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'date' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th><a ng-click="sortType = 'obstacles'; sortReverse = !sortReverse">
+                Obstacles
+                <span ng-show="sortType == 'obstacles' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'obstacles' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th><a ng-click="sortType = 'pedestrians'; sortReverse = !sortReverse">
+                Pedestrians
+                <span ng-show="sortType == 'pedestrians' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'pedestrians' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th><a ng-click="sortType = 'tags'; sortReverse = !sortReverse">
+                Tags
+                <span ng-show="sortType == 'tags' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'tags' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th>Notes</th>
+        <th> </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="x in data.training_data | orderBy:sortType:sortReverse">
+        <td><input type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="train">Train  </input>
+	    <input type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="test">Test  </input>
+	    <input type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="split">Split </input>
+	</td>
+        <td>{{ '{{x.location}}' }}</td>
+        <td>{{ '{{x.recordedBy}}' }}</td>
+        <td>{{ '{{x.date}}' }}</td>
+        <td>{{ '{{x.obstacles}}' }}</td>
+        <td>{{ '{{x.pedestrians}}' }}</td>
+        <!--<td><div ng-repeat="y in x.tags">{{y}}</div></td>-->
+        <td>{{ '{{x.tags}}' }}</td>
+        <td>{{ '{{x.notes}}' }}</td>
+        <td><span ng-click="selectDatasetForDelete(x)" data-toggle="modal" data-target="#deleteDataset" class="glyphicon glyphicon-trash"></span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="form-group">
+    <button class="btn btn-default" data-toggle="modal" data-target="#trainModel">Train</button>
+    <!--<button class="btn btn-default" ng-click="doit()">Do the thing</button>-->
+  </div>
+
+  <div class="modal fade" id="trainModel" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header title">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h2 class="modal-title">Train Model</h2>
+        </div>
+        <div class="modal-body">
+          <h3>Model Name:</h3>
+          <input class="form-control" ng-model="data.modelData.name"/>
+          <h3>Notes: </h3>
+	  <textarea class="form-control" rows="3" ng-model="data.modelData.notes"></textarea>
+          <h3>Augmentations:<h3>
+          <h4> <input type="checkbox" ng-model="data.modelData.augmentations.bin_uniform" ng-false-value="false">Bin Uniform </h4>
+          <h4> <input type="checkbox" ng-model="data.modelData.augmentations.simple_uniform" ng-false-value="false">Simple Uniform </h4>
+          <h4> <input type="checkbox" ng-model="data.modelData.augmentations.skew" ng-false-value="false">Skew</h4> 
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default btn-lg" ng-click="train()" data-dismiss="modal">Train</button>
+        </div>
+        </div> <!-- modal-content -->
+    </div> <!-- modal-dialog -->
+  </div> <!-- modal -->
+
+  <div class="modal fade" id="deleteDataset" role="dialog">
+    <div class="modal-dialog">  
+      <div class="modal-content">
+        <div class="modal-header title">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h3>Are you sure you want to delete this dataset?</h3>
+          <h4>{{ '{{deleteThisDataset.date}} ' }}</h4>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default btn-lg" ng-click="deleteDataset()" data-dismiss="modal">Delete</button>
+        </div>
+
+      </div> <!-- modal-content -->
+    </div> <!-- modal-dialog -->
+  </div> <!-- modal -->
+
+  </div>
+
+  </div>
+</div>
+
+</body>
+</html>
