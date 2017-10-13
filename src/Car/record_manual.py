@@ -1,40 +1,74 @@
-# Collect training from a manual driver
+import time
+from datetime import datetime
+import shutil
+import imageio
+import ocam
+import threading
+## Add Sibling directory to PATH
 import sys, os
 sys.path.append(os.path.abspath("../Comms"))
 # Import Car class from Car.py
 from Car import Car
-import ocam
-import time
-from datetime import datetime
-import shutil
 
 
-# TODO
-# Use Ocam - figure out format
-# Mount network drive
-# Record all channels and timestamp
-# Create save_entry function
+
+########### CONFIG ######################
+# Port for Arduino
+port = "/dev/ttyACM0"
+# Local temporary directory for storing dataset
+directory = '/home/odroid/training_data_tmp'
+# Record rate
+record_rate = 9 #fps
+########### END CONFIG ##################
 
 
-print( " Autonomous Prime - Collect Training Data " )
-print( " Please type information and press enter (simply press enter to stick to defaults or leave blank) ")
+print( ">> Autonomous Prime - Collect Training Data " )
 
-directory = raw_input('Mapped Network Drive: (Default: \\h01.ece.iastate.edu/ecpeprime/training_data) ') or "//h01.ece.iastate.edu/ecpeprime/training_data"
-recorders = raw_input('Who is capturing the data? ') or ""
-location =  raw_input('Where are you recording? ') or ""
-batch_size = int(raw_input('What batch size do you want? (Default: 64) ') or 64)
-obstacles = raw_input('Obstacles (low, med, high): ') or ""
-pedestrians = raw_input('Pedestrians (low, med, high): ') or ""
-tags = raw_input('Tags (separated by commas): ') or ""
-notes = raw_input('Any Notes: ') or ""
+# Connect to Camera
+# locate camera 
+devpath = ocam.FindCamera('oCam')
+if(devpath is None):
+    sys.exit()
+cam = ocam.oCams(devpath, verbose=0)
+
+# set format to 1280*720. Must be set before starting the camera
+cam.Set((b'Greyscale 8-bit (Y800)', 1280, 720, 60))
+# Open camera    
+print(">> Opening camera")
+cam.Start()
+# Clear camera buffer. First few frames are usually corrupt
+for i in range(0,10):
+    cam.GetFrame()
+print(">> Camera Open")
 
 
-# folders contain batch_size photos, framerate is number of photos per folder
+# Connect to car
+car = Car()
+car.connect(port=port)
+print(">> Waiting to hear from vehicle on ",port," ...")
+while(not car.connected):
+   time.sleep(0.05)
+print(">> Car is connected!")
+
+
+# Tag this recording with extra info
+print( ">> Please type information and press enter (simply press enter to stick to defaults or leave blank) ")
+recorders = input('<< Who is capturing the data? ') or ""
+location =  input('<< Where are you recording? ') or ""
+batch_size = int(input('<< What batch size do you want? (Default: 64) ') or 64)
+obstacles = input('<< Obstacles (low, med, high): ') or ""
+pedestrians = input('<< Pedestrians (low, med, high): ') or ""
+tags = input('<< Tags (separated by commas): ') or ""
+notes = input('<< Any Notes: ') or ""
+
+
+print('>> Writing metadata...') # Takes a second for automount to do its job
+# Create Folder for this Run based on current timestamp
 run_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 if not os.path.exists(directory + "/" + run_name):
     os.makedirs(directory + "/" + run_name)# name describing this run
-metadata = open(directory+ "/" + run_name + "/metadata.txt", 'w')
-
+metadata = open(directory+ "/" + run_name + "/metadata.txt", 'w') 
+# Write meta data to folder
 metadata.write(" Recorded by: " + recorders + "~")
 metadata.write(" Location: " + location + "~")
 metadata.write(" Batch Size: " + str(batch_size) + "~")
@@ -43,63 +77,86 @@ metadata.write(" Pedestrians: " + pedestrians + "~")
 metadata.write(" Tags: " + tags + "~")
 metadata.write(" Notes: " + notes + "~")
 metadata.write(" Date: " + run_name + "~")
-
-# Connect to car
-car = Car()
-car.connect(port="/dev/ttyACM0")
-print("Waiting to hear from vehicle...")
-while(not car.connected):
-    time.sleep(0.05)
-print("Car is connected!")
+metadata.close()
 
 
-# locate camera
-devpath = ocam.FindCamera('oCam')
-cam = ocam.oCams(devpath, verbose=0)
-# set format to 1280*720. Must be set before starting the camera
-cam.Set(fmtlist[1])
-# Open camera
-cam.Start()
-# Clear Camera buffer
-for i in range(0,10):
-    cam.GetFrame()
-print("Camera is open")
+# State variables
+frame_count = 0
+batch_num = 0
+last_entry = 0
 
-# State Variables
-count = 0
-batch_num = 0;
-
+# Start recording
+print(">> Recording")
 try:
-    while True:
-        if count % batch_size == 0:
-            if (count > 0) :
+    # Record while we are connected or until ctrl-c
+    while car.connected:
+
+        # Check to see if we should create a new batch
+        if frame_count % batch_size == 0:
+            if (frame_count > 0) :
                 data.close()
                 batch_num += 1
-                count = 0
-            if not os.path.exists(directory + "/" + run_name + "/" + str(batch_num)):
-                os.makedirs(directory + "/" + run_name + "/" + str(batch_num))# name describing this run
-            data = open(directory + "/" + run_name + "/" + str(batch_num) + "/data.txt", 'w')
+                frame_count = 0
 
-        # Capture Frame
-        image = cam.GetFrame()
-        # Read RC input from user
-        channels = car.channels_in;
-        steering_command = channels["steering"]
-        # Save entry
-        cv2.imwrite(directory+ "/" + run_name + "/" + str(batch_num) + "/%d.jpg" %count, image)
-        data.write(str(steering_command) + " " + str(count) + ".jpg\n")
+            batch_dir = directory + "/" + run_name + "/" + str(batch_num)
+            if not os.path.exists(batch_dir):
+                os.makedirs(batch_dir)
 
-        count += 1
+            # Open data file and add header
+            data = open(batch_dir + "/data.csv", 'w')
+            data.write("timestamp,img_file,steering,throttle,aux1,aux2,mode\n")
 
-        time.sleep(.2)
 
+        # Record data at certain frequency
+        if time.time() - last_entry > 1.0/record_rate:
+            # Timestamp entry            
+            timestamp = time.time()
+            
+            # Get RC Controller channels
+            channels = car.channels_in;
+            mode = car.mode;
+            
+            # grab image
+            image = cam.GetFrame()
+
+            # Save image
+            img_file = "{}/{}/{}.png".format(run_name,str(batch_num),str(frame_count)) 
+            imageio.imwrite(directory + "/" + img_file,image,compression=1)
+           
+            # Save entry
+            entry = "{}, {}, {}, {}, {}, {}, {}\n".format(str(timestamp),
+                                                        str(img_file),
+                                                        str(channels["steering"][0]),
+                                                        str(channels["throttle"][0]),
+                                                        str(channels["aux1"][0]),
+                                                        str(channels["aux2"][0]),
+                                                        str(mode))
+            data.write(entry)
+
+            # print debug
+            fps = round(1.0/(timestamp - last_entry),2)
+            print("Batch: {}, Frame: {} -- fps: {} -- mode: {}, str: {}, thr: {}, aux1: {}, aux2: {}".format(batch_num,frame_count,fps,mode,channels["steering"][0], channels["throttle"][0],channels["aux1"][0],channels["aux2"][0]))
+
+            # update state
+            frame_count += 1
+            last_entry = timestamp
+
+
+    
+    # Check to see if we ended gracefully
+    if not car.connected:
+        print(">> ERROR: Car disconnected. Stopped recording") 
+        
 
 finally:
+    print (">> Done!")
+    # close data file
     data.close()
-    metadata.close()
-    if (count < batch_size - 1):
-        shutil.rmtree(directory + "/" + run_name + "/" + str(batch_num))
-
-    print ("Done!")
-    cam.Stop()
+    # close camera
+    cam.Close()
+    # Close connection to car
     car.close()
+
+
+    
+
