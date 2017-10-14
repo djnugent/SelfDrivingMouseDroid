@@ -62,7 +62,7 @@ while car.channels_in["throttle"][0] < 930:
 print( ">> Please type information and press enter (simply press enter to stick to defaults or leave blank) ")
 recorders = input('<< Who is capturing the data? ') or ""
 location =  input('<< Where are you recording? ') or ""
-batch_size = int(input('<< What batch size do you want? (Default: 64) ') or 64)
+batch_size = int(input('<< What batch size do you want? (Default: 128) ') or 128)
 obstacles = input('<< Obstacles (low, med, high): ') or ""
 pedestrians = input('<< Pedestrians (low, med, high): ') or ""
 tags = input('<< Tags (separated by commas): ') or ""
@@ -76,14 +76,14 @@ if not os.path.exists(directory + "/" + run_name):
     os.makedirs(directory + "/" + run_name)# name describing this run
 metadata = open(directory+ "/" + run_name + "/metadata.txt", 'w') 
 # Write meta data to folder
-metadata.write(" Recorded by: " + recorders + "~")
-metadata.write(" Location: " + location + "~")
-metadata.write(" Batch Size: " + str(batch_size) + "~")
-metadata.write(" Obstacles: " + obstacles + "~")
-metadata.write(" Pedestrians: " + pedestrians + "~")
-metadata.write(" Tags: " + tags + "~")
-metadata.write(" Notes: " + notes + "~")
-metadata.write(" Date: " + run_name + "~")
+metadata.write(recorders + "~")
+metadata.write(location + "~")
+metadata.write(str(batch_size) + "~")
+metadata.write(obstacles + "~")
+metadata.write(pedestrians + "~")
+metadata.write(tags + "~")
+metadata.write(notes + "~")
+metadata.write(run_name + "~")
 metadata.close()
 
 

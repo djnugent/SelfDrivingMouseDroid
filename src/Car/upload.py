@@ -22,9 +22,6 @@ def copy_all(src,dst):
 		    shutil.copy(src_file, dst_dir)
 
 
-# Regex for extracting batchsize from meta data
-p = re.compile("Batch Size: (?:\d*)?\d+")
-
 
 # List runs
 path, runs, files = os.walk(local_directory).__next__()
@@ -37,7 +34,7 @@ for i,run in enumerate(runs):
 	metadata = open(local_directory + "/" + run + "/metadata.txt","r")
 	line = metadata.read()
 	metadata.close()
-	batch_size = int(p.search(line).group().replace("Batch Size: ",""))
+	batch_size = int(line.split('~')[2])
 
 	# Detect batches in each run
 	path, batches, files = os.walk(local_directory + "/" + run).__next__()
@@ -57,7 +54,8 @@ for i,run in enumerate(runs):
 
 
 	# transfer meta data
-	shutil.copy(local_directory + "/" + run + "/metadata.txt", remote_directory + "/" + run + "/metadata.txt")
+	if os.path.isdir(remote_directory + "/" + run):
+		shutil.copy(local_directory + "/" + run + "/metadata.txt", remote_directory + "/" + run + "/metadata.txt")
 	
 	# delete run from local directory after successful transfer
 	print("   --Run {} transfer complete. Removing".format(i))
