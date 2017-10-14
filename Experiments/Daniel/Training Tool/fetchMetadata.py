@@ -21,5 +21,4 @@ def fetch():
                               "notes":entries[6],
                               "date":entries[7]}
                 data.append(json_entry)
-    #print(json.dumps(data))
-    return json.dumps(data)                
+    return json.dumps(data)
