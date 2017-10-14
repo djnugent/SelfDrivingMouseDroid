@@ -49,6 +49,13 @@ print(">> Waiting to hear from vehicle on ",port," ...")
 while(not car.connected):
    time.sleep(0.05)
 print(">> Car is connected!")
+time.sleep(0.3)
+
+# Wait for controller to be turned on or in range
+if car.channels_in["throttle"][0] < 930:
+    print(">> Please connect transmitter")
+while car.channels_in["throttle"][0] < 930:
+    time.sleep(0.05)
 
 
 # Tag this recording with extra info
@@ -62,7 +69,7 @@ tags = input('<< Tags (separated by commas): ') or ""
 notes = input('<< Any Notes: ') or ""
 
 
-print('>> Writing metadata...') # Takes a second for automount to do its job
+print('>> Writing metadata...') 
 # Create Folder for this Run based on current timestamp
 run_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 if not os.path.exists(directory + "/" + run_name):
@@ -85,11 +92,18 @@ frame_count = 0
 batch_num = 0
 last_entry = 0
 
+# Wait for user to switch out of failsafe mode
+if car.mode == "failsafe":
+    print(">> Waiting for user to switch out of failsafe mode...")
+while car.mode == "failsafe":
+    time.sleep(0.05)
+	
+
 # Start recording
 print(">> Recording")
 try:
-    # Record while we are connected or until ctrl-c
-    while car.connected:
+    # Record while we are connected and not failsafed or until ctrl-c
+    while car.connected and car.mode != "failsafe":
 
         # Check to see if we should create a new batch
         if frame_count % batch_size == 0:
@@ -146,6 +160,8 @@ try:
     # Check to see if we ended gracefully
     if not car.connected:
         print(">> ERROR: Car disconnected. Stopped recording") 
+    if car.mode == "failsafe":
+        print(">> ERROR: Car went into failsafe mode. Stopped recording") 
         
 
 finally:
