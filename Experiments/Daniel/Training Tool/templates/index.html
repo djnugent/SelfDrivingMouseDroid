@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CNN Data Management</title>
+
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='neural_net_icon.png') }}"/>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<link href="https://fonts.googleapis.com/css?family=Exo|Monda|Play|Ubuntu+Condensed" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+<script type="text/javascript">
+initData({{data|tojson}});
+</script>
+
+</head>
+<body ng-app="app" ng-controller="ctrl" ng-init="initMetadata()">
+
+
+<div class="title">
+  <div class="row">
+    <div class="col-md-4">
+      <!-- image or something? -->
+    </div>
+    <div class="col-md-7">
+      <h1>Convolutional Neural Network</h1>
+      <h2>Training and Data Management Tool</h2>
+    </div>
+  </div>
+</div>
+
+<div class="row content">
+  <div class="col-md-10 col-md-offset-1">
+  <h2>Train the Network</h2>
+
+<div id="table">
+  <form hidden>
+    	<div class="form-group">
+    		<div class="input-group">
+        		<div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+        		<input type="text" class="form-control" placeholder="Search Training Data" ng-model="searchData">
+      		</div>
+    	</div>
+  	</form>
+
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Selection</th>
+        <th><a ng-click="sortType = 'location'; sortReverse = !sortReverse">
+                Location
+                <span ng-show="sortType == 'location' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'location' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th><a ng-click="sortType = 'recordedBy'; sortReverse = !sortReverse">
+                Recorded By
+                <span ng-show="sortType == 'recordedBy' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'recordedBy' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th><a ng-click="sortType = 'date'; sortReverse = !sortReverse">
+                Date
+                <span ng-show="sortType == 'date' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'date' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th><a ng-click="sortType = 'obstacles'; sortReverse = !sortReverse">
+                Obstacles
+                <span ng-show="sortType == 'obstacles' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'obstacles' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th><a ng-click="sortType = 'pedestrians'; sortReverse = !sortReverse">
+                Pedestrians
+                <span ng-show="sortType == 'pedestrians' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'pedestrians' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th><a ng-click="sortType = 'tags'; sortReverse = !sortReverse">
+                Tags
+                <span ng-show="sortType == 'tags' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="sortType == 'tags' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="x in data.training_data track by $index | orderBy:sortType:sortReverse">
+        <td><input type="radio" name="{{ '{{x.date}}' }}" ng-click="addTrain(x.date)">Train </input>
+	    <input type="radio" name="{{ '{{x.date}}' }}" ng-click="addTest(x.date)">Test </input></td>
+        <td>{{ '{{x.location}}' }}</td>
+        <td>{{ '{{x.recordedBy}}' }}</td>
+        <td>{{ '{{x.date}}' }}</td>
+        <td>{{ '{{x.obstacles}}' }}</td>
+        <td>{{ '{{x.pedestrians}}' }}</td>
+        <!--<td><div ng-repeat="y in x.tags">{{y}}</div></td>-->
+        <td>{{ '{{x.tags}}' }}</td>
+        <td>{{ '{{x.notes}}' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="form-group">
+    <button class="btn btn-default" ng-click="train()">Train</button>
+  </div>
+
+
+
+  </div>
+
+  </div>
+</div>
+
+</body>
+</html>

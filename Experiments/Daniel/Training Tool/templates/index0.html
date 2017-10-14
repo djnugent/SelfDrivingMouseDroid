@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CNN Data Management</title>
+
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='neural_net_icon.png') }}"/>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+<script type="text/javascript" src="static/script.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css?family=Exo|Monda|Play|Ubuntu+Condensed" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="static/style.css">
+
+<script type="text/javascript">
+initData({{data|tojson}});
+</script>
+
+
+
+</head>
+<body ng-app="app" ng-controller="ctrl" ng-init="initGraph()">
+
+
+<div class="title">
+  <div class="row">
+    <div class="col-md-4">
+      <!-- image or something? -->
+    </div>
+    <div class="col-md-7">
+      <h1>Convolutional Neural Network</h1>
+      <h2>Training and Data Management Tool</h2>
+    </div>
+  </div>
+</div>
+
+<div class="row content">
+  <div class="col-md-10 col-md-offset-1">
+  <h2>Training Progress</h2>
+
+
+  <div >
+    <canvas id="lineGraph" height="350" ></canvas>
+  </div>
+
+  <div class="form-group">
+    <button class="btn btn-default" ng-click="refetch()">Refetch</button>
+  </div>
+
+
+
+  </div>
+</div>
+
+</body>
+</html>
