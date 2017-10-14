@@ -17,6 +17,9 @@
 #define aux1_channel 4     // LEFT SWITCH
 #define aux2_channel 7     // MIDDLE SWITCH
 
+// Failsafe throttle
+#define failsafe_throttle 930
+
 uint16_t ppm[16];  //array for storing up to 16 servo signals
 
 #define CHANNELS_IN_RATE 40 //hz
@@ -58,27 +61,34 @@ void setup() {
 
 void loop() {
 
-  // Extract and modify pulse data from global ppm array
-  uint16_t throttle_val = (uint16_t) (1500 + (((float) (ppm[throttle_channel]) - 1500) * throttle_scale));
+  // Extract pulse data from global ppm array
+  uint16_t throttle_val = ppm[throttle_channel];
   uint16_t steering_val = ppm[steering_channel];
   uint16_t aux1_val = ppm[aux1_channel];
   uint16_t aux2_val = ppm[aux2_channel];
-  
+
+  // Check for RC and Odroid Connection
+  detect_RC();
+  detect_odroid();
+
   // Send a heartbeat to odroid
   send_heartbeat();
 
+  // Scale throttle if we are connected to RC
+  if(RC_connected){
+    throttle_val = (uint16_t) (1500 + (((float) (ppm[throttle_channel]) - 1500) * throttle_scale));
+  }
+  
   // Send values to odroid
   send_vals(throttle_val, steering_val, aux1_val, aux2_val);
-
-  // Check for RC and Odroid Conntection
-  detect_RC();
-  detect_odroid();
 
   // Decode any messages sent from the odroid
   recv_msg();
 
+  // See if the user has flipped the mode switch
   check_mode_change();
 
+  // Check failsafe
   if ((!odroid_connected && mode == MODE_AUTO) || !RC_connected) {
     mode = MODE_FAILSAFE;  
   }
@@ -134,7 +144,7 @@ void detect_odroid(){
 
 // Check if RC Controller is sending signals
 void detect_RC() {
-  if (ppm[1] < 930) {
+  if (ppm[throttle_channel] < failsafe_throttle) {
     RC_connected = false;
   }
   else {
