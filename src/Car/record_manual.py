@@ -168,6 +168,8 @@ finally:
     print (">> Done!")
     # close data file
     data.close()
+    # Sync all buffers
+    os.sync()
     # close camera
     cam.Close()
     # Close connection to car
