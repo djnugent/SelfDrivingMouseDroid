@@ -11,6 +11,13 @@ sys.path.append(os.path.abspath("../Comms"))
 from Car import Car
 
 
+## Manual data recorder for collecting datasets
+# Usage:
+#   - Records while in manual mode
+#   - Stops recording when in failsafe mode
+#   - Creates a new batch: after collection of [batch_size] samples OR if you stop recording and start again
+#   - stores files locally. Use `upload.py` to upload dataset to storage server
+
 
 ########### CONFIG ######################
 # Port for Arduino
@@ -22,7 +29,7 @@ record_rate = 9 #fps
 ########### END CONFIG ##################
 
 
-print( ">> Autonomous Prime - Collect Training Data " )
+print( ">> Autonomous Prime - Collect Training Data ")
 
 # Connect to Camera
 # locate camera 
@@ -60,13 +67,13 @@ while car.channels_in["throttle"][0] < 930:
 
 # Tag this recording with extra info
 print( ">> Please type information and press enter (simply press enter to stick to defaults or leave blank) ")
-recorders = input('<< Who is capturing the data? ') or ""
-location =  input('<< Where are you recording? ') or ""
+recorders = (input('<< Who is capturing the data? ') or "").lower()
+location =  (input('<< Where are you recording? ') or "").lower()
 batch_size = int(input('<< What batch size do you want? (Default: 128) ') or 128)
-obstacles = input('<< Obstacles (low, med, high): ') or ""
-pedestrians = input('<< Pedestrians (low, med, high): ') or ""
-tags = input('<< Tags (separated by commas): ') or ""
-notes = input('<< Any Notes: ') or ""
+obstacles = (input('<< Obstacles (low, med, high): ') or "").lower()
+pedestrians = (input('<< Pedestrians (low, med, high): ') or "").lower()
+tags = (input('<< Tags (separated by commas): ') or "").lower()
+notes = (input('<< Any Notes: ') or "").lower()
 
 
 print('>> Writing metadata...') 
@@ -88,72 +95,85 @@ metadata.close()
 
 
 # State variables
-frame_count = 0
-batch_num = 0
-last_entry = 0
-
-# Wait for user to switch out of failsafe mode
-if car.mode == "failsafe":
-    print(">> Waiting for user to switch out of failsafe mode...")
-while car.mode == "failsafe":
-    time.sleep(0.05)
-	
+frame_count = 0 # count
+batch_num = 0 # count
+last_entry = 0 # time
+data = None # File descriptor
+recording = False # whether we WERE in a recording
+    
 
 # Start recording
 print(">> Recording")
 try:
-    # Record while we are connected and not failsafed or until ctrl-c
-    while car.connected and car.mode != "failsafe":
+    # Record while we are connected or until ctrl-c
+    while car.connected:
+        # Only record in manual mode
+        if car.mode != "manual":
+            if recording:
+                # Close last batch
+                if data is not None:
+                    data.close()
+                    data = None
+                recording = False
+            print(">> Switch into MANUAL mode to start recording")
+            time.sleep(0.3)
+                
+        else:
+            # Check to see if we should create a new batch
+            if frame_count == batch_size or not recording:
+                print(">> Creating new batch")
+                recording = True
+                # Close last batch
+                if data is not None:
+                    data.close()
+                    data = None
+                # Create new batch
+                batch_dir = directory + "/" + run_name + "/" + str(batch_num)
+                if not os.path.exists(batch_dir):
+                    os.makedirs(batch_dir)
 
-        # Check to see if we should create a new batch
-        if frame_count % batch_size == 0:
-            if (frame_count > 0) :
-                data.close()
+                # Open data file and add header
+                data = open(batch_dir + "/data.csv", 'w')
+                data.write("timestamp,img_file,steering,throttle,aux1,aux2,mode\n")
+
+                # update state
                 batch_num += 1
                 frame_count = 0
+               
 
-            batch_dir = directory + "/" + run_name + "/" + str(batch_num)
-            if not os.path.exists(batch_dir):
-                os.makedirs(batch_dir)
+            # Record data at certain frequency
+            if time.time() - last_entry > 1.0/record_rate:
+                # Timestamp entry            
+                timestamp = time.time()
+                
+                # Get RC Controller channels
+                channels = car.channels_in;
+                mode = car.mode;
+                
+                # grab image
+                image = cam.GetFrame()
 
-            # Open data file and add header
-            data = open(batch_dir + "/data.csv", 'w')
-            data.write("timestamp,img_file,steering,throttle,aux1,aux2,mode\n")
+                # Save image - subtract 1 from batch number because batch_number is actually next batch number
+                img_file = "{}/{}/{}.png".format(run_name,str(batch_num-1),str(frame_count)) 
+                imageio.imwrite(directory + "/" + img_file,image,compression=1)
+               
+                # Save entry
+                entry = "{}, {}, {}, {}, {}, {}, {}\n".format(str(timestamp),
+                                                            str(img_file),
+                                                            str(channels["steering"][0]),
+                                                            str(channels["throttle"][0]),
+                                                            str(channels["aux1"][0]),
+                                                            str(channels["aux2"][0]),
+                                                            str(mode))
+                data.write(entry)
 
+                # print debug
+                fps = round(1.0/(timestamp - last_entry),2)
+                print("Batch: {}, Frame: {} -- fps: {} -- mode: {}, str: {}, thr: {}, aux1: {}, aux2: {}".format(batch_num-1,frame_count,fps,mode,channels["steering"][0], channels["throttle"][0],channels["aux1"][0],channels["aux2"][0]))
 
-        # Record data at certain frequency
-        if time.time() - last_entry > 1.0/record_rate:
-            # Timestamp entry            
-            timestamp = time.time()
-            
-            # Get RC Controller channels
-            channels = car.channels_in;
-            mode = car.mode;
-            
-            # grab image
-            image = cam.GetFrame()
-
-            # Save image
-            img_file = "{}/{}/{}.png".format(run_name,str(batch_num),str(frame_count)) 
-            imageio.imwrite(directory + "/" + img_file,image,compression=1)
-           
-            # Save entry
-            entry = "{}, {}, {}, {}, {}, {}, {}\n".format(str(timestamp),
-                                                        str(img_file),
-                                                        str(channels["steering"][0]),
-                                                        str(channels["throttle"][0]),
-                                                        str(channels["aux1"][0]),
-                                                        str(channels["aux2"][0]),
-                                                        str(mode))
-            data.write(entry)
-
-            # print debug
-            fps = round(1.0/(timestamp - last_entry),2)
-            print("Batch: {}, Frame: {} -- fps: {} -- mode: {}, str: {}, thr: {}, aux1: {}, aux2: {}".format(batch_num,frame_count,fps,mode,channels["steering"][0], channels["throttle"][0],channels["aux1"][0],channels["aux2"][0]))
-
-            # update state
-            frame_count += 1
-            last_entry = timestamp
+                # update state
+                frame_count += 1
+                last_entry = timestamp
 
 
     
