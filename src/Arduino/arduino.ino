@@ -20,6 +20,9 @@
 // Failsafe throttle
 #define failsafe_throttle 930
 
+// Steering trim
+#define steering_trim 18 //useconds
+
 uint16_t ppm[16];  //array for storing up to 16 servo signals
 
 #define CHANNELS_IN_RATE 40 //hz
@@ -94,13 +97,13 @@ void loop() {
   }
   
   if (mode == MODE_FAILSAFE) {
-    steering.write(1500);
+    steering.write(1500 + steering_trim);
     throttle.write(1500);
   } else if (mode == MODE_MANUAL) {
-    steering.write(steering_val);
+    steering.write(steering_val + steering_trim);
     throttle.write(throttle_val);
   } else if (mode == MODE_AUTO){
-    steering.write(auto_steering_val);
+    steering.write(auto_steering_val + steering_trim);
     throttle.write(auto_throttle_val); 
   }
 
