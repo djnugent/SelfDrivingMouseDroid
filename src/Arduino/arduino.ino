@@ -101,7 +101,7 @@ void loop() {
     throttle.write(throttle_val);
   } else if (mode == MODE_AUTO){
     steering.write(auto_steering_val);
-    throttle.write(throttle_val);   // NOT USING AUTO THROTTLE
+    throttle.write(auto_throttle_val); 
   }
 
 }
@@ -165,7 +165,7 @@ void handle_control(uint8_t* payload){
 
   //echo it back as a channels_in msg
   //send_debug(control.throttle,control.steering,control.aux1);
-  send_channels_in(control.throttle,control.steering,control.aux1,control.aux2);
+  //send_channels_in(control.throttle,control.steering,control.aux1,control.aux2);
 
   auto_steering_val = control.steering;
   auto_throttle_val = control.throttle;
