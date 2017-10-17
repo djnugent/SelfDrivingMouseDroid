@@ -1,6 +1,8 @@
 import os
 from time import sleep
 
+from dataManage import writeModelData
+
 def trainOn(modelData, resultNumbers=[]):
       for dataset in modelData["datasets"]:
             print("dataset: " + str(dataset))
@@ -15,3 +17,10 @@ def trainOn(modelData, resultNumbers=[]):
       #store resultNumbers in a file somewhere, along with ModelName, notes, etc.
       del resultNumbers[:]
       return 
+
+
+
+
+#writeModelData(modelData): 
+      #{"stats":{"loss":"100", "epochs":"6h45"}, "modelName":"modelName"}
+      
