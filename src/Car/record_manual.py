@@ -84,7 +84,7 @@ run_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 if not os.path.exists(directory + "/" + run_name):
     os.makedirs(directory + "/" + run_name)# name describing this run
 metadata_file = open(directory+ "/" + run_name + "/metadata.txt", 'w') 
-json.dumps(metadata, metadata_file)
+json.dump(metadata, metadata_file)
 
 # State variables
 frame_count = 0 # count
