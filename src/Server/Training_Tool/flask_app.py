@@ -19,7 +19,7 @@ def index():
     if (len(resultNumbers) > 0):
         return flask.render_template('index0.html', data = resultNumbers)
     else:
-        metadata = fetch()
+        metadata = fetchMetadata()
         return flask.render_template('index.html', data = metadata)
 
 
@@ -28,7 +28,6 @@ def train():
     if request.method == "POST":
         #print("TRAINING")
         content = request.get_json()
-
         trainingThread = threading.Thread(target = trainOn, args=(), kwargs={'modelData':content['modelData'], 'resultNumbers':resultNumbers})
         trainingThread.start()
         return json.dumps({"status":"ok"})
