@@ -4,7 +4,7 @@ import shutil, sys
 
 directory = "/remote/rs/ecpeprime/training_data"
 
-def fetch():
+def fetchMetadata():
     print("Fetching Metadata")
 
     data = [];
@@ -27,5 +27,11 @@ def fetch():
     return json.dumps(data)   
 
 
+def writeModelData(modelData)
+    open(os.path.join(directory, date, modelData["modelName"+.txt]), 'w') as f:
+    json.dump(modelData, f)
+
+
+   
 def deleteDataset(dataset):
     shutil.rmtree(os.path.join(directory, dataset), ignore_errors=False, onerror=None)
