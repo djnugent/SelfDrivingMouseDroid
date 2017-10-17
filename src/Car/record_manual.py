@@ -1,4 +1,5 @@
 import time
+import json
 from datetime import datetime
 import shutil
 import imageio
@@ -66,14 +67,15 @@ while car.channels_in["throttle"][0] < 930:
 
 
 # Tag this recording with extra info
+metadata = {}
 print( ">> Please type information and press enter (simply press enter to stick to defaults or leave blank) ")
-recorders = (input('<< Who is capturing the data? ') or "").lower()
-location =  (input('<< Where are you recording? ') or "").lower()
-batch_size = int(input('<< What batch size do you want? (Default: 128) ') or 128)
-obstacles = (input('<< Obstacles (low, med, high): ') or "").lower()
-pedestrians = (input('<< Pedestrians (low, med, high): ') or "").lower()
-tags = (input('<< Tags (separated by commas): ') or "").lower()
-notes = (input('<< Any Notes: ') or "").lower()
+metadata["recorders"] = (input('<< Who is capturing the data? ') or "").lower()
+metadata["location"] =  (input('<< Where are you recording? ') or "").lower()
+metadata["batch_size"] = int(input('<< What batch size do you want? (Default: 128) ') or 128)
+metadata["obstacles"] = (input('<< Obstacles (low, med, high): ') or "").lower()
+metadata["pedestrians"] = (input('<< Pedestrians (low, med, high): ') or "").lower()
+metadata["tags"] = (input('<< Tags (separated by commas): ') or "").lower()
+metadata["notes"] = (input('<< Any Notes: ') or "").lower()
 
 
 print('>> Writing metadata...') 
@@ -81,18 +83,8 @@ print('>> Writing metadata...')
 run_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 if not os.path.exists(directory + "/" + run_name):
     os.makedirs(directory + "/" + run_name)# name describing this run
-metadata = open(directory+ "/" + run_name + "/metadata.txt", 'w') 
-# Write meta data to folder
-metadata.write(recorders + "~")
-metadata.write(location + "~")
-metadata.write(str(batch_size) + "~")
-metadata.write(obstacles + "~")
-metadata.write(pedestrians + "~")
-metadata.write(tags + "~")
-metadata.write(notes + "~")
-metadata.write(run_name + "~")
-metadata.close()
-
+metadata_file = open(directory+ "/" + run_name + "/metadata.txt", 'w') 
+json.dump(metadata, metadata_file)
 
 # State variables
 frame_count = 0 # count
