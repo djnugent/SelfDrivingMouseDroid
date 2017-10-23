@@ -71,7 +71,8 @@ metadata = {}
 print( ">> Please type information and press enter (simply press enter to stick to defaults or leave blank) ")
 metadata["recorders"] = (input('<< Who is capturing the data? ') or "").lower()
 metadata["location"] =  (input('<< Where are you recording? ') or "").lower()
-metadata["batch_size"] = int(input('<< What batch size do you want? (Default: 128) ') or 128)
+batch_size = int(input('<< What batch size do you want? (Default: 128) ') or 128)
+metadata["batch_size"] = batch_size
 metadata["obstacles"] = (input('<< Obstacles (low, med, high): ') or "").lower()
 metadata["pedestrians"] = (input('<< Pedestrians (low, med, high): ') or "").lower()
 metadata["tags"] = (input('<< Tags (separated by commas): ') or "").lower()
