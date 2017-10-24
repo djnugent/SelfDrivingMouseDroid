@@ -11,15 +11,15 @@ def fetchMetadata():
     for subdir, dirs, files in os.walk(directory):
         for file in files:
             if file == "metadata.txt":
-                with open(file) as metadata_file:
-                    data = json.load(data_file)
+                with open(os.path.join(subdir, file)) as metadata_file:
+                    data = json.load(metadata_file)
 
     return data   
 
 
-def writeModelData(modelData)
-    open(os.path.join(directory, date, modelData["modelName"+.txt]), 'w') as f:
-    json.dump(modelData, f)
+def writeModelData(modelData):
+    with open(os.path.join(directory, date, modelData["modelName"]+".txt"), 'w') as f:
+        json.dump(modelData, f)
 
 
    
