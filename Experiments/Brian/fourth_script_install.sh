@@ -1,25 +1,26 @@
 #!/bin/bash
 
 #cd ..
-sudo apt-get install python3.4-dev
-pip install numpy
+# sudo apt-get install python3.4-dev
+# pip install numpy
 
-mkdir opencv_tmp
- cd opencv_tmp
- git clone https://github.com/Itseez/opencv.git
- cd opencv
- git checkout 3.1.0
+# mkdir opencv_tmp
+ # cd opencv_tmp
+ # git clone https://github.com/Itseez/opencv.git
+ # cd opencv
+ # git checkout 3.1.0
 
- cd ..
- mkdir opencv_contrib_tmp
- cd opencv_contrib_tmp
- git clone https://github.com/Itseez/opencv_contrib.git
- cd opencv_contrib
- git checkout 3.1.0
- cd ..
+ # cd ..
+ # mkdir opencv_contrib_tmp
+ # cd opencv_contrib_tmp
+ # git clone https://github.com/Itseez/opencv_contrib.git
+ # cd opencv_contrib
+ # git checkout 3.1.0
+ # cd ..
 
  
  cd opencv_tmp/opencv
+ pwd
  mkdir build 
  cd build
  cmake -D CMAKE_BUILD_TYPE=RELEASE 
