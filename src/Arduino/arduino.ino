@@ -81,7 +81,7 @@ void loop() {
   if(RC_connected){
     throttle_val = (uint16_t) (1500 + (((float) (ppm[throttle_channel]) - 1500) * throttle_scale));
   }
-  
+
   // Send values to odroid
   send_vals(throttle_val, steering_val, aux1_val, aux2_val);
 
@@ -93,9 +93,9 @@ void loop() {
 
   // Check failsafe
   if ((!odroid_connected && mode == MODE_AUTO) || !RC_connected) {
-    mode = MODE_FAILSAFE;  
+    mode = MODE_FAILSAFE;
   }
-  
+
   if (mode == MODE_FAILSAFE) {
     steering.write(1500 + steering_trim);
     throttle.write(1500);
@@ -104,13 +104,13 @@ void loop() {
     throttle.write(throttle_val);
   } else if (mode == MODE_AUTO){
     steering.write(auto_steering_val + steering_trim);
-    throttle.write(auto_throttle_val); 
+    throttle.write(auto_throttle_val);
   }
 
 }
 
 // Change mode using RC switch
-// But only rising and falling edges, not levels. 
+// But only rising and falling edges, not levels.
 // That way we don't override system failsafes
 void check_mode_change(){
   uint16_t us_thresh = 490;
@@ -187,7 +187,7 @@ void handle_set_mode(uint8_t* payload){
 void recv_msg(){
   byte payload[32];
   static int dropped = 0;
-  
+
   if(Serial.available()){
     //sync data stream
     while(true){
@@ -195,7 +195,7 @@ void recv_msg(){
       byte b = Serial.peek();
       if(b == START){break;}
       else{
-        Serial.read();       
+        Serial.read();
        }
     }
     //discard start byte
@@ -241,14 +241,14 @@ void read_ppm(){  //leave this alone
     ppm[channel] = (counter + pulse)/2;
     channel++;
   }
-  
+
 }
 
 // Wrapper function to send heartbeat at a fixed rate
 void send_heartbeat(){
   //store state between iterations
   static long last_heartbeat_send = 0;
-  
+
   //send at an interval
   if(millis() - last_heartbeat_send > 1000/HEARTBEAT_RATE){
     send_heartbeat(mode,errors);
@@ -260,7 +260,7 @@ void send_heartbeat(){
 void send_vals(uint16_t throttle_val, uint16_t steering_val, uint16_t aux1_val, uint16_t aux2_val){
   //store state between iterations
   static long last_channels_in_send = 0;
-  
+
   //send at an interval
   if(millis() - last_channels_in_send > 1000/CHANNELS_IN_RATE){
     send_channels_in(throttle_val,steering_val,aux1_val,aux2_val);

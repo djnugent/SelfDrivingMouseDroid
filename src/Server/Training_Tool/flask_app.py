@@ -23,12 +23,20 @@ def index():
         return flask.render_template('index.html', data = metadata)
 
 
+@APP.route('/keras/callback', methods=['POST'])
+def update_metrics():
+    if request.method == "POST":
+        print("KERAS CALLBACK")
+        content = request.get_json()
+        print(content["data"])
+
 @APP.route('/train', methods=['POST'])
 def train():
     if request.method == "POST":
         #print("TRAINING")
         content = request.get_json()
-        trainingThread = threading.Thread(target = trainOn, args=(), kwargs={'modelData':content['modelData'], 'resultNumbers':resultNumbers})
+        print(content)
+        trainingThread = threading.Thread(target = trainOn, args=(), kwargs={'modelData':content['modelData']})
         trainingThread.start()
         return json.dumps({"status":"ok"})
 
