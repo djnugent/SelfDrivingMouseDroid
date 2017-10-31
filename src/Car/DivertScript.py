@@ -77,11 +77,7 @@ def executeManeuver(dist):
           car.control(throttle=2000, steering=1500)
           time.sleep(0.2)
           car.control(throttle=1500) 
-<<<<<<< HEAD
 
-=======
-          
->>>>>>> cd93fa355083b632dbe5f12930004bf625231fca
      finally:
           car.close()    
 
