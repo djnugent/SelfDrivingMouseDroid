@@ -2,7 +2,6 @@
 # TODO
 # Save model on file server
 # Cache datasets
-# Log results in CSV
 # Take in augmentation stuff
 
 import csv
@@ -10,10 +9,12 @@ import numpy as np
 import imageio
 import cv2
 import os
+import shutil, sys
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
-from keras.callbacks import ModelCheckpoint, RemoteMonitor
+from keras.callbacks import ModelCheckpoint, RemoteMonitor, TensorBoard
 from keras.models import load_model
+from datetime import datetime
 
 ## Add Sibling directory to PATH
 import sys, os
@@ -22,7 +23,14 @@ sys.path.append(os.path.abspath("../../../src/Model"))
 from model import v1, preprocess_camera, preprocess_steering, mean_precision_error, cfg
 
 # Location of training data
-base_dir = "/remote/rs/ecpeprime/training_data/"
+remote_dir = "/remote/rs/ecpeprime/training_data/"
+cache_dir = "/var/tmp/training_data/"
+
+# Location of pretrained models
+model_dir = "/remote/rs/ecpeprime/pretrained_models/"
+
+# Location of logs
+log_dir = "/remote/rs/ecpeprime/training_logs/"
 
 # Generate batches of data
 # Randomly Drop near zero batches
@@ -43,7 +51,7 @@ def gen(samples, batch_size=32):
                 continue
 
             # read in image
-            image = imageio.imread(base_dir + sample["img_file"])
+            image = imageio.imread(cache_dir + sample["img_file"])
             image = preprocess_camera(image)
 
             images.append(image)
@@ -58,11 +66,32 @@ def gen(samples, batch_size=32):
                 yield shuffle(X,y)
 
 
+def cacheDataset(dataset,storage_directory, tmp_directory):
+    dst_dir = os.path.join(tmp_directory, dataset)
+    src_dir = os.path.join(storage_directory, dataset)
+
+    # Only copy directories that don't exist
+    if not os.path.exists(dst_dir):
+        print("Caching dir: ", src_dir)
+        os.makedirs(dst_dir, exist_ok=True)
+        for src_dir, dirs, files in os.walk(src_dir):
+            for subdir in dirs:
+                dst_subdir = os.path.join(dst_dir, subdir)
+                src_subdir = os.path.join(src_dir, subdir)
+
+                if not os.path.exists(dst_subdir):
+                    os.makedirs(dst_subdir, exist_ok=True)
+                for src_subdir, subdirs, files in os.walk(src_subdir):
+                    for file_ in files:
+                        src_file = os.path.join(src_subdir, file_)
+                        dst_file = os.path.join(dst_subdir, file_)
+                        shutil.copy(src_file, dst_subdir)
+
+
 
 def trainOn(modelData, config=""):
       train_samples = []
       test_samples = []
-      print("Caching Files...")
 
       print("Parsing CSV")
       # Iterate through each dataset
@@ -74,10 +103,13 @@ def trainOn(modelData, config=""):
                 continue
             use = dataset["use"]
 
+            # Cache dataset if needed
+            cacheDataset(date, remote_dir,cache_dir)
+
             # Iterate through each batch
-            path, batches, files = os.walk(base_dir + date).__next__()
+            path, batches, files = os.walk(cache_dir + date).__next__()
             for batch in batches:
-                with open(base_dir + date + "/" + batch + "/data.csv") as f:
+                with open(cache_dir + date + "/" + batch + "/data.csv") as f:
                     reader = csv.reader(f, skipinitialspace=True)
                     header = next(reader)
                     if use == "train":
@@ -114,12 +146,13 @@ def trainOn(modelData, config=""):
       train_generator = gen(train_samples, batch_size=batch_size)
       validation_generator = gen(test_samples, batch_size=batch_size)
 
-      # Remote callback
-      remote = RemoteMonitor(root='http://0.0.0.0:8080', path='/keras/callback/', field='data', headers=None)
+      # Tensorboard
+      log_path = log_dir + datetime.now().strftime('%m_%d_%Y--%H_%M')
+      tb = TensorBoard(log_dir=log_path)
 
       # Checkpoint callback
-      best_model_path= "../../Model/pretrained_models/model.best.h5"
-      model_path = "../../Model/pretrained_models/model.h5"
+      best_model_path= model_dir + "model.best.h5"
+      model_path = model_dir + "model.h5"
       checkpoint = ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1, save_best_only=True)
 
       # model
@@ -127,7 +160,7 @@ def trainOn(modelData, config=""):
       print("loading model...")
       if  os.path.exists(best_model_path):
           print("Found model in progress. Resuming")
-          model = load_model("best_model_path",custom_objects={'mean_precision_error': mean_precision_error})
+          model = load_model(best_model_path,custom_objects={'mean_precision_error': mean_precision_error})
       else:
           print("No model found. Creating new model")
           model = v1()
@@ -135,7 +168,9 @@ def trainOn(modelData, config=""):
 
       # fit model
       print("Fitting model")
-      model.fit_generator(train_generator, samples_per_epoch= train_epoch_size, validation_data=validation_generator, nb_val_samples=test_epoch_size, nb_epoch=epochs,callbacks=[checkpoint, remote])
+      model.fit_generator(train_generator, samples_per_epoch= train_epoch_size,\
+        validation_data=validation_generator, nb_val_samples=test_epoch_size,\
+        nb_epoch=epochs,callbacks=[checkpoint, tb])
 
       model.save(model_path)
       print('Training thread all done')

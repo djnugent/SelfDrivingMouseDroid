@@ -10,34 +10,27 @@ from trainNetwork import *
 # Create the application.
 APP = flask.Flask(__name__)
 
-resultNumbers = []
+resultNumbers = None
 
 @APP.route('/')
 def index():
     """ Displays the index page accessible at '/'
     """
-    if (len(resultNumbers) > 0):
+    if resultNumbers is not None:
         return flask.render_template('index0.html', data = resultNumbers)
     else:
         metadata = fetchMetadata()
         return flask.render_template('index.html', data = metadata)
 
 
-@APP.route('/keras/callback', methods=['POST'])
-def update_metrics():
-    if request.method == "POST":
-        print("KERAS CALLBACK")
-        content = request.get_json()
-        print(content["data"])
-
 @APP.route('/train', methods=['POST'])
 def train():
     if request.method == "POST":
         #print("TRAINING")
         content = request.get_json()
-        print(content)
         trainingThread = threading.Thread(target = trainOn, args=(), kwargs={'modelData':content['modelData']})
         trainingThread.start()
+        resultNumbers = []
         return json.dumps({"status":"ok"})
 
 @APP.route('/delete', methods=['POST'])
