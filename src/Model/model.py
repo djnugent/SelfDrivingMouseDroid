@@ -1,6 +1,6 @@
 import cv2
 from keras.models import Sequential, Model
-from keras.layers import BatchNormalization, RELU
+from keras.layers import BatchNormalization
 from keras.layers.core import Dense, Dropout, Activation, Flatten, Reshape
 from keras.layers.convolutional import Convolution2D
 from keras import backend as K
@@ -8,21 +8,32 @@ import numpy as np
 
 
 # Constants
-rows = 100
-cols = 100
-num_chan = 1
-
+class Object(object):
+    pass
+cfg = Object()
+cfg.rows = 100
+cfg.cols = 100
+cfg.num_chan = 1
+cfg.roi = ((170,190),(1110,590)) # ((left,top),(right,bottom))
 
 # Prep data before it enters the network
 def preprocess_camera(img):
-    roi = ((92,335),(933,651))
     #crop
-    img = img[roi[0][1]:roi[1][1],roi[0][0]:roi[1][0]]
+    img = img[cfg.roi[0][1]:cfg.roi[1][1],cfg.roi[0][0]:cfg.roi[1][0]]
     # resize
-    img = cv2.resize(img,None,fx=0.35,fy=0.35)
+    img = cv2.resize(img,(cfg.rows,cfg.cols))[:,:,None]
     # Mean zero
     img = img/127.5 -1.
-    return img, roi
+    return img
+
+# Normalize data before it enters the network
+# Zero mean, stdev = 1
+def preprocess_steering(val):
+    return (val - 1500) /500.0
+
+# Scale data from network for arduino
+def postprocess_steering(val):
+    return int(val * 500.0 + 1500)
 
 # Custom lost function - Amplifies errors that occur near zero
 def mean_precision_error(y_true, y_pred):
@@ -34,7 +45,7 @@ def mean_precision_error(y_true, y_pred):
 def v1():
     model = Sequential()
     # Block - conv
-    model.add(Convolution2D(16, 8, 8, border_mode='valid', subsample=[4,4], activation='relu', name='Conv1',input_shape=(None,rows,cols,num_chan)))
+    model.add(Convolution2D(16, 8, 8, border_mode='valid', subsample=[4,4], activation='relu', name='Conv1',input_shape=(cfg.rows,cfg.cols,cfg.num_chan)))
     model.add(BatchNormalization())
     # Block - conv
     model.add(Convolution2D(36, 5, 5, border_mode='valid', subsample=[2,2], activation='relu', name='Conv2'))
@@ -53,4 +64,5 @@ def v1():
     model.add(Dropout(0.5))
     # Block - output - linear
     model.add(Dense(1, name='output'))
-    model.summary()
+    model.compile(loss='mse', optimizer='adam')
+    return model

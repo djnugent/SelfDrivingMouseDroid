@@ -7,7 +7,7 @@ export PS1="\[\033[38;5;2m\]\u\[$(tput sgr0)\]\[\033[38;5;15m\]@\h:\[$(tput sgr0
 PATH=$PATH:$HOME/local/bin
 
 # Set up CUDA for tensorflow
-export CUDA_INSTALL_PATH=/usr/local/cuda
+export CUDA_INSTALL_PATH=/usr/local/cuda-8.0
 export PATH=$PATH:$CUDA_INSTALL_PATH/bin/
 export CUDA_HOME=$CUDA_INSTALL_PATH
 export CUDA_PATH=$CUDA_INSTALL_PATH

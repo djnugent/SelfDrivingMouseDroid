@@ -12,7 +12,7 @@ def fetchMetadata():
         for file in files:
             if file == "metadata.txt":
                 with open(os.path.join(subdir, file)) as metadata_file:
-                    data = json.load(metadata_file)
+                    data.append(json.load(metadata_file))
 
     return data   
 

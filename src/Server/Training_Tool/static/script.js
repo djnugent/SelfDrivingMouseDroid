@@ -1,5 +1,5 @@
 function initData(metadata) {
-	//console.log(metadata);
+	console.log(metadata);
 	window.metadata = metadata;
 }
 
@@ -15,7 +15,7 @@ app.controller('ctrl', function($scope, $location, $http, $rootScope, $filter, $
 
  $scope.initMetadata = function() {
 //	console.log($window.metadata)
-	$scope.data.training_data = JSON.parse($window.metadata);
+	$scope.data.training_data = $window.metadata;
 	console.log($scope.data.training_data);
 }
 

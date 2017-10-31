@@ -10,13 +10,13 @@ from trainNetwork import *
 # Create the application.
 APP = flask.Flask(__name__)
 
-resultNumbers = []
+resultNumbers = None
 
 @APP.route('/')
 def index():
     """ Displays the index page accessible at '/'
     """
-    if (len(resultNumbers) > 0):
+    if resultNumbers is not None:
         return flask.render_template('index0.html', data = resultNumbers)
     else:
         metadata = fetchMetadata()
@@ -28,8 +28,9 @@ def train():
     if request.method == "POST":
         #print("TRAINING")
         content = request.get_json()
-        trainingThread = threading.Thread(target = trainOn, args=(), kwargs={'modelData':content['modelData'], 'resultNumbers':resultNumbers})
+        trainingThread = threading.Thread(target = trainOn, args=(), kwargs={'modelData':content['modelData']})
         trainingThread.start()
+        resultNumbers = []
         return json.dumps({"status":"ok"})
 
 @APP.route('/delete', methods=['POST'])
