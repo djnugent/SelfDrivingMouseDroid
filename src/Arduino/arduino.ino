@@ -78,7 +78,7 @@ void loop() {
   send_heartbeat();
 
   // Scale throttle if we are connected to RC
-  if(RC_connected){
+  if(RC_connected and throttle_val > 1500){
     throttle_val = (uint16_t) (1500 + (((float) (ppm[throttle_channel]) - 1500) * throttle_scale));
   }
 
