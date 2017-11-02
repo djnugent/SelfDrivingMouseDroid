@@ -10,17 +10,12 @@ from trainNetwork import *
 # Create the application.
 APP = flask.Flask(__name__)
 
-resultNumbers = None
-
 @APP.route('/')
 def index():
     """ Displays the index page accessible at '/'
     """
-    if resultNumbers is not None:
-        return flask.render_template('index0.html', data = resultNumbers)
-    else:
-        metadata = fetchMetadata()
-        return flask.render_template('index.html', data = metadata)
+    metadata = fetchMetadata()
+    return flask.render_template('index.html', data = metadata)
 
 
 @APP.route('/train', methods=['POST'])

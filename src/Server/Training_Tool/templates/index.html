@@ -31,6 +31,7 @@ initData({{data|tojson}});
     <div class="col-md-12">
       <h1>Convolutional Neural Network</h1>
       <h2>Training and Data Management Tool</h2>
+      <a href="/other/" onclick="javascript:event.target.port=8081">Link to port 8081</a>
     </div>
   </div>
 </div>
@@ -121,7 +122,7 @@ initData({{data|tojson}});
           <h3>Augmentations:<h3>
           <h4> <input type="checkbox" ng-model="data.modelData.augmentations.bin_uniform" ng-false-value="false">Bin Uniform </h4>
           <h4> <input type="checkbox" ng-model="data.modelData.augmentations.simple_uniform" ng-false-value="false">Simple Uniform </h4>
-          <h4> <input type="checkbox" ng-model="data.modelData.augmentations.skew" ng-false-value="false">Skew</h4> 
+          <h4> <input type="checkbox" ng-model="data.modelData.augmentations.skew" ng-false-value="false">Skew</h4>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default btn-lg" ng-click="train()" data-dismiss="modal">Train</button>
@@ -131,7 +132,7 @@ initData({{data|tojson}});
   </div> <!-- modal -->
 
   <div class="modal fade" id="deleteDataset" role="dialog">
-    <div class="modal-dialog">  
+    <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header title">
           <button type="button" class="close" data-dismiss="modal">&times;</button>

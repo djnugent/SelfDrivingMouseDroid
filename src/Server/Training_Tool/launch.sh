@@ -6,7 +6,7 @@ tmux new-session -d -s ${SESSION_NAME}
 tmux send-keys -t ${SESSION_NAME} "htop"
 # TensorBoard
 tmux new-window -n tensorboard -t ${SESSION_NAME}
-tmux send-keys -t ${SESSION_NAME}:1 "tensorboard --port 6006 --logdir /remote/rs/ecpeprime/training_logs"
+tmux send-keys -t ${SESSION_NAME}:1 "tensorboard --port 8081 --logdir /remote/rs/ecpeprime/training_logs"
 # Flask
 tmux new-window -n flask -t ${SESSION_NAME}
 tmux send-keys -t ${SESSION_NAME}:2 "bash"
