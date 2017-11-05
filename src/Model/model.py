@@ -11,7 +11,7 @@ import numpy as np
 class Object(object):
     pass
 cfg = Object()
-cfg.rows = 100
+cfg.rows = 200
 cfg.cols = 100
 cfg.num_chan = 1
 cfg.roi = ((170,190),(1110,590)) # ((left,top),(right,bottom))
