@@ -95,7 +95,7 @@ class Record():
             thread = threading.Thread(target=self.auto_recording, args=(car,))
             #auto_recording(car)
         self.recording = True
-	thread.start()
+    thread.start()
         
     def manual_recording(self,car):
         #manual recording method
