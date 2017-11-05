@@ -6,7 +6,8 @@ from Car import Car
 
 hypotenuse = 2.829
 degToServo = 5
-minThrottle = 1445
+#minThrottle = 1445
+minThrottle = 1555
 
 def main(argv):
      inputDistance = ''
@@ -65,16 +66,16 @@ def executeManeuver(dist):
           #start recording
           #straight
           #turn
-          car.control(throttle=minThrottle, second_turn)
+          car.control(throttle=minThrottle, steering=int(second_turn))
           time.sleep(0.5)
           
           #turn
-          car.control(throttle=minThrottle, first_turn)
+          car.control(throttle=minThrottle, steering=int(first_turn))
           time.sleep(0.5)
           #straight
           #stop recording
           #brake
-          car.control(throttle=2000, steering=1500)
+          car.control(throttle=1000, steering=1500)
           time.sleep(0.2)
           car.control(throttle=1500) 
 
