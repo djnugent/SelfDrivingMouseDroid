@@ -119,7 +119,7 @@ def trainOn(modelData, config=""):
                     elif use == "split":
                         temp_samples = [dict(zip(header, map(str, row))) for row in reader]
                         temp_samples = shuffle(temp_samples)
-                        temp_train_samples, temp_test_samples = train_test_split(temp_samples, test_size=0.3)
+                        temp_train_samples, temp_test_samples = train_test_split(temp_samples, test_size=0.15)
                         train_samples += temp_train_samples
                         test_samples += temp_test_samples
 

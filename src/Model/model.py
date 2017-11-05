@@ -45,7 +45,7 @@ def mean_precision_error(y_true, y_pred):
 def v1():
     model = Sequential()
     # Block - conv
-    model.add(Convolution2D(16, 8, 8, border_mode='valid', subsample=[4,4], activation='relu', name='Conv1',input_shape=(cfg.rows,cfg.cols,cfg.num_chan)))
+    model.add(Convolution2D(16, 8, 8, border_mode='valid', subsample=[4,4], activation='relu', name='Conv1',input_shape=(cfg.cols,cfg.rows,cfg.num_chan)))
     model.add(BatchNormalization())
     # Block - conv
     model.add(Convolution2D(36, 5, 5, border_mode='valid', subsample=[2,2], activation='relu', name='Conv2'))
