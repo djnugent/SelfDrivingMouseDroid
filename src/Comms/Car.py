@@ -19,6 +19,9 @@ class Car():
         # Holds outgoing messages
         self.outgoing = mgr.Queue()
 
+        # Store last sent control messages
+        self.last_control = mgr.dict({'throttle':0,'steering':0,'aux1':0,'aux2':0})
+
         # Callbacks for when messages come in
         self.heartbeat_callback = None
         self.channels_callback = None
@@ -42,8 +45,8 @@ class Car():
             self.set_mode("failsafe")
             print("Sending termination command")
             self.IO_process.terminate()
-            print("Waiting for process to join...")
-            self.IO_process.join()
+            #print("Waiting for process to join...")
+            #self.IO_process.join()
             print("closed")
 
     # Set a callback_function for when we get a heartbeat message
@@ -65,6 +68,17 @@ class Car():
         msg = proto.pack_control(throttle,steering,aux1,aux2)
         with self.write_lock:
             self.outgoing.put(msg)
+        with self.read_lock:
+            self.last_control["throttle"] = throttle
+            self.last_control["steering"] = steering
+            self.last_control["aux1"] = aux1
+            self.last_control["aux2"] = aux2
+
+    # Get last sent control message
+    @property
+    def control_out(self):
+        with self.read_lock:
+            return {k:self.last_control[k] for k in ["throttle","steering","aux1","aux2"] if k in self.last_control}
 
     # Set the vehicle's mode
     def set_mode(self,mode):
