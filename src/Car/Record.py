@@ -90,12 +90,12 @@ class Record():
     def start_recording(self,car):
         #check to see what mode it is in, call proper recording method 
         if record_mode is None:
-            thread = threading.Thread(target=self.manual_recording, args=(car,))
+            self.thread = threading.Thread(target=self.manual_recording, args=(car,))
         else:
-            thread = threading.Thread(target=self.auto_recording, args=(car,))
+            self.thread = threading.Thread(target=self.auto_recording, args=(car,))
             #auto_recording(car)
         self.recording = True
-    thread.start()
+        self.thread.start()
         
     def manual_recording(self,car):
         #manual recording method
