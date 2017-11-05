@@ -26,6 +26,7 @@ cam = None
 #running variables
 isRunning = False
 stopRunning = False
+recording = False
 ########### END CONFIG ##################
 
 class Record():
@@ -77,39 +78,40 @@ class Record():
         
     def close(self):
         #close all files and do any finishing work here
-        stop_recording()
+        self.stop_recording()
     
-    def set_mode(mode):
-        record_mode = mode
+    def set_mode(self,mode):
+        self.record_mode = mode
         
     #def set_metadata_from_file(file):
         #read in the metadata from a file
         #check with user to see if the information is correct
         
-    def start_recording(car):
+    def start_recording(self,car):
         #check to see what mode it is in, call proper recording method 
-        if mode is None:
-            thread = threading.Thread(target=manual_recording, args=(car,))
+        if record_mode is None:
+            thread = threading.Thread(target=self.manual_recording, args=(car,))
         else:
-            thread = threading.Thread(target=auto_recording, args=(car,))
-            auto_recording(car)
-        thread.start()
+            thread = threading.Thread(target=self.auto_recording, args=(car,))
+            #auto_recording(car)
+        self.recording = True
+	thread.start()
         
-    def manual_recording(car):
+    def manual_recording(self,car):
         #manual recording method
         # Start recording
-        isRunning = True
+        self.isRunning = True
         print(">> Recording")
         try:
             # Record while we are connected or until ctrl-c
             while car.connected:
-                with running_lock:
-                    if recording and stopRunning:
+                with self.running_lock:
+                    if self.recording and self.stopRunning:
                         if data is not None:
                             data.close()
                             data = None
-                            recording = False
-                            isRunning = False
+                            self.recording = False
+                            self.isRunning = False
                             break
                 # Only record in manual mode
                 if car.mode != "manual":
@@ -118,15 +120,15 @@ class Record():
                         if data is not None:
                             data.close()
                             data = None
-                        recording = False
+                        self.recording = False
                     print(">> Switch into MANUAL mode to start recording")
                     time.sleep(0.3)
                         
                 else:
                     # Check to see if we should create a new batch
-                    if frame_count == batch_size or not recording:
+                    if frame_count == batch_size or not self.recording:
                         print(">> Creating new batch")
-                        recording = True
+                        self.recording = True
                         # Close last batch
                         if data is not None:
                             data.close()
@@ -200,30 +202,30 @@ class Record():
             
 
         
-    def auto_recording(car):
+    def auto_recording(self,car):
         #auto recording method
                 # Start recording
-        isRunning = True
+        self.isRunning = True
         print(">> Recording")
         try:
             # Record while we are connected or until ctrl-c
             while car.connected:
-                with running_lock:
-                    if recording and stopRunning:
+                with self.running_lock:
+                    if self.recording and self.stopRunning:
                         if data is not None:
                             data.close()
                             data = None
-                            recording = False
-                            isRunning = False
+                            self.recording = False
+                            self.isRunning = False
                             break
                 # Only record in auto mode
                 if car.mode != "auto":
-                    if recording:
+                    if self.recording:
                         # Close last batch
                         if data is not None:
                             data.close()
                             data = None
-                        recording = False
+                        self.recording = False
                     print(">> Switch into MANUAL mode to start recording")
                     time.sleep(0.3)
                         
@@ -231,7 +233,7 @@ class Record():
                     # Check to see if we should create a new batch
                     if frame_count == batch_size or not recording:
                         print(">> Creating new batch")
-                        recording = True
+                        self.recording = True
                         # Close last batch
                         if data is not None:
                             data.close()
@@ -302,16 +304,16 @@ class Record():
             # close camera
             cam.Close()
         
-    def stop_recording():
+    def stop_recording(self):
         #stop the recording multi-threading?
-        with stop_lock:
-            stopRunning = True
+        with self.running_lock:
+            self.stopRunning = True
         stillRunning = True
         
         while stillRunning == True:
             time.sleep(0.05)
-            with running_lock:
-                stillRunning = isRunning
+            with self.running_lock:
+                stillRunning = self.isRunning
         
         print(">> Stopped Recording")
             
