@@ -46,9 +46,9 @@ def executeManeuver(dist):
           first_turn = 1500 + delta_servo
           second_turn = 1500 + (-1) * delta_servo
           print("first turn: {}\nsecond turn: {}".format(first_turn, second_turn))
-		  
-		  record = Record()
-		  record.set_mode(1)
+          
+          record = Record()
+          record.set_mode(1)
 
           car.control(throttle=1500, steering=1500)
           print("Beginning maneuver")
@@ -60,7 +60,7 @@ def executeManeuver(dist):
           #turn
           #car.control(throttle=minThrottle, steering=first_turn)
           car.control(throttle=minThrottle, steering=int(first_turn))
-		  
+          
           time.sleep(0.5)
 
           #turn
@@ -68,10 +68,10 @@ def executeManeuver(dist):
           time.sleep(0.5)
           
           #straight
-		  car.control(throttle=minThrottle, steering=1500)
-		  #start recording
-		  record.start_recording(car)
-		  time.sleep(0.5)
+          car.control(throttle=minThrottle, steering=1500)
+          #start recording
+          record.start_recording(car)
+          time.sleep(0.5)
           
           #turn
           car.control(throttle=minThrottle, steering=int(second_turn))
@@ -81,9 +81,9 @@ def executeManeuver(dist):
           car.control(throttle=minThrottle, steering=int(first_turn))
           time.sleep(0.5)
           #straight
-		  car.control(throttle=minThrottle, steering=1500)
-		  record.stop_recording()
-		  time.sleep(0.3)
+          car.control(throttle=minThrottle, steering=1500)
+          record.stop_recording()
+          time.sleep(0.3)
           #stop recording
           #brake
           car.control(throttle=1000, steering=1500)
