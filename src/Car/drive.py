@@ -46,7 +46,8 @@ print(">> Car is connected!")
 time.sleep(0.3)
 
 # Load model
-model_path = "model.h5"
+print( ">> Loading Model... ")
+model_path = "/home/odroid/models/model.h5"
 model = load_model(model_path,custom_objects={'mean_precision_error': mean_precision_error})
 
 # Wait for controller to be turned on or in range
@@ -72,18 +73,18 @@ try:
 
             # Predict steering angle based on image
             start = time.time()
-            model.predict(image[:,:,None])
+            raw_steering = model.predict(image[None,:,:,:])[0,0]
             cnn_perf = round((time.time()-start)*1000,1)
 
             # Post process steering value
             steering = postprocess_steering(raw_steering)
 
             # Control the car with user throttle and CNN steering
-            throttle = car.channels_in["throttle"]
+            throttle = car.channels_in["throttle"][0]
             car.control(throttle = throttle, steering=steering)
 
             # Print performance info
-            perf = round(1.0/(cam_perf + preproc_perf + cnn_perf),2)
+            perf = round(1000/(cam_perf + preproc_perf + cnn_perf),2)
             fmt = "Str: {}us, thr: {}us, fps:{}, cam: {}ms, resize: {}ms, model: {}ms"
             print(fmt.format(steering,throttle,perf,cam_perf,preproc_perf,cnn_perf))
 
