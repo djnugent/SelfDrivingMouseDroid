@@ -12,21 +12,21 @@ import sys, os
 
 ########### CONFIG ######################
 # Port for Arduino
-port = "/dev/ttyACM0"
+#port = "/dev/ttyACM0"
 # Local temporary directory for storing dataset
-directory = '/home/odroid/training_data_tmp'
+#directory = '/home/odroid/training_data_tmp'
 # Record rate
-record_rate = 9 #fps
+#record_rate = 9 #fps
 #Mode: 0 = manual, 1 = auto
-record_mode = 0
+#record_mode = 0
 #Thread for recording
-thread = None
+#thread = None
 #Camera object
-cam = None
+#cam = None
 #running variables
-isRunning = False
-stopRunning = False
-recording = False
+#isRunning = False
+#stopRunning = False
+#recording = False
 ########### END CONFIG ##################
 
 class Record():
@@ -36,20 +36,31 @@ class Record():
         mgr = multiprocessing.Manager()
         self.stop_lock = mgr.Lock()
         self.running_lock = mgr.Lock()
+        self.isRunning = False
+        self.stopRunning = False
+        self.recording = False
         # Connect to Camera
+        self.batch_size = 0
+        self.cam = None
+        self.thread = None
+        self.record_mode = 0
+        self.record_rate = 9
+        self.directory = '/home/odroid/training_data_tmp'
+        self.port = "/dev/ttyACM0"
+        self.run_name = None
         # locate camera 
         devpath = ocam.FindCamera('oCam')
         if(devpath is None):
             sys.exit()
-        cam = ocam.oCams(devpath, verbose=0)
+        self.cam = ocam.oCams(devpath, verbose=0)
         # set format to 1280*720. Must be set before starting the camera
-        cam.Set((b'Greyscale 8-bit (Y800)', 1280, 720, 60))
+        self.cam.Set((b'Greyscale 8-bit (Y800)', 1280, 720, 60))
         # Open camera    
         print(">> Opening camera")
-        cam.Start()
+        self.cam.Start()
         # Clear camera buffer. First few frames are usually corrupt
         for i in range(0,10):
-            cam.GetFrame()
+            self.cam.GetFrame()
         print(">> Camera Open")
         
         # Tag this recording with extra info
@@ -57,8 +68,8 @@ class Record():
         print( ">> Please type information and press enter (simply press enter to stick to defaults or leave blank) ")
         metadata["recorders"] = (input('<< Who is capturing the data? ') or "").lower()
         metadata["location"] =  (input('<< Where are you recording? ') or "").lower()
-        batch_size = int(input('<< What batch size do you want? (Default: 128) ') or 128)
-        metadata["batch_size"] = batch_size
+        self.batch_size = int(input('<< What batch size do you want? (Default: 128) ') or 128)
+        metadata["batch_size"] = self.batch_size
         metadata["obstacles"] = (input('<< Obstacles (low, med, high): ') or "").lower()
         metadata["pedestrians"] = (input('<< Pedestrians (low, med, high): ') or "").lower()
         metadata["tags"] = (input('<< Tags (separated by commas): ') or "").lower()
@@ -67,11 +78,11 @@ class Record():
 
         print('>> Writing metadata...') 
         # Create Folder for this Run based on current timestamp
-        run_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        metadata["date"] = run_name
-        if not os.path.exists(directory + "/" + run_name):
-            os.makedirs(directory + "/" + run_name)# name describing this run
-        metadata_file = open(directory+ "/" + run_name + "/metadata.txt", 'w') 
+        self.run_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        metadata["date"] = self.run_name
+        if not os.path.exists(self.directory + "/" + self.run_name):
+            os.makedirs(self.directory + "/" + self.run_name)# name describing this run
+        metadata_file = open(self.directory+ "/" + self.run_name + "/metadata.txt", 'w') 
         json.dump(metadata, metadata_file)
 
         
@@ -89,7 +100,7 @@ class Record():
         
     def start_recording(self,car):
         #check to see what mode it is in, call proper recording method 
-        if record_mode is None:
+        if self.record_mode is None:
             self.thread = threading.Thread(target=self.manual_recording, args=(car,))
         else:
             self.thread = threading.Thread(target=self.auto_recording, args=(car,))
@@ -100,6 +111,10 @@ class Record():
     def manual_recording(self,car):
         #manual recording method
         # Start recording
+        frame_count = 0
+        batch_num = 0
+        last_entry = 0
+        data = None
         self.isRunning = True
         print(">> Recording")
         try:
@@ -126,7 +141,7 @@ class Record():
                         
                 else:
                     # Check to see if we should create a new batch
-                    if frame_count == batch_size or not self.recording:
+                    if frame_count == self.batch_size or not self.recording:
                         print(">> Creating new batch")
                         self.recording = True
                         # Close last batch
@@ -134,7 +149,7 @@ class Record():
                             data.close()
                             data = None
                         # Create new batch
-                        batch_dir = directory + "/" + run_name + "/" + str(batch_num)
+                        batch_dir = self.directory + "/" + self.run_name + "/" + str(batch_num)
                         if not os.path.exists(batch_dir):
                             os.makedirs(batch_dir)
 
@@ -148,7 +163,7 @@ class Record():
                        
 
                     # Record data at certain frequency
-                    if time.time() - last_entry > 1.0/record_rate:
+                    if time.time() - last_entry > 1.0/self.record_rate:
                         # Timestamp entry            
                         timestamp = time.time()
                         
@@ -157,11 +172,11 @@ class Record():
                         mode = car.mode;
                         
                         # grab image
-                        image = cam.GetFrame()
+                        image = self.cam.GetFrame()
 
                         # Save image - subtract 1 from batch number because batch_number is actually next batch number
-                        img_file = "{}/{}/{}.png".format(run_name,str(batch_num-1),str(frame_count)) 
-                        imageio.imwrite(directory + "/" + img_file,image,compression=1)
+                        img_file = "{}/{}/{}.png".format(self.run_name,str(batch_num-1),str(frame_count)) 
+                        imageio.imwrite(self.directory + "/" + img_file,image,compression=1)
                        
                         # Save entry
                         entry = "{}, {}, {}, {}, {}, {}, {}\n".format(str(timestamp),
@@ -197,7 +212,7 @@ class Record():
             # Sync all buffers
             os.sync()
             # close camera
-            cam.Close()
+            self.cam.Close()
             
             
 
@@ -205,7 +220,12 @@ class Record():
     def auto_recording(self,car):
         #auto recording method
                 # Start recording
+        frame_count = 0
+        batch_num = 0
+        last_entry = 0
+        data = None
         self.isRunning = True
+        self.recording = True
         print(">> Recording")
         try:
             # Record while we are connected or until ctrl-c
@@ -226,12 +246,12 @@ class Record():
                             data.close()
                             data = None
                         self.recording = False
-                    print(">> Switch into MANUAL mode to start recording")
+                    print(">> Switch into  AUTO mode to start recording")
                     time.sleep(0.3)
                         
                 else:
                     # Check to see if we should create a new batch
-                    if frame_count == batch_size or not recording:
+                    if frame_count == self.batch_size or not self.recording:
                         print(">> Creating new batch")
                         self.recording = True
                         # Close last batch
@@ -239,7 +259,7 @@ class Record():
                             data.close()
                             data = None
                         # Create new batch
-                        batch_dir = directory + "/" + run_name + "/" + str(batch_num)
+                        batch_dir = self.directory + "/" + self.run_name + "/" + str(batch_num)
                         if not os.path.exists(batch_dir):
                             os.makedirs(batch_dir)
 
@@ -253,7 +273,7 @@ class Record():
                        
 
                     # Record data at certain frequency
-                    if time.time() - last_entry > 1.0/record_rate:
+                    if time.time() - last_entry > 1.0/self.record_rate:
                         # Timestamp entry            
                         timestamp = time.time()
                         
@@ -262,11 +282,11 @@ class Record():
                         mode = car.mode;
                         
                         # grab image
-                        image = cam.GetFrame()
+                        image = self.cam.GetFrame()
 
                         # Save image - subtract 1 from batch number because batch_number is actually next batch number
-                        img_file = "{}/{}/{}.png".format(run_name,str(batch_num-1),str(frame_count)) 
-                        imageio.imwrite(directory + "/" + img_file,image,compression=1)
+                        img_file = "{}/{}/{}.png".format(self.run_name,str(batch_num-1),str(frame_count)) 
+                        imageio.imwrite(self.directory + "/" + img_file,image,compression=1)
                        
                         # Save entry
                         entry = "{}, {}, {}, {}, {}, {}, {}\n".format(str(timestamp),
@@ -302,7 +322,8 @@ class Record():
             # Sync all buffers
             os.sync()
             # close camera
-            cam.Close()
+            self.cam.Close()
+            self.thread.join()
         
     def stop_recording(self):
         #stop the recording multi-threading?
