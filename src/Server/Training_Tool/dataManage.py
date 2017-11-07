@@ -14,14 +14,14 @@ def fetchMetadata():
                 with open(os.path.join(subdir, file)) as metadata_file:
                     data.append(json.load(metadata_file))
 
-    return data   
+    return data
 
 
-def writeModelData(modelData):
-    with open(os.path.join(directory, date, modelData["modelName"]+".txt"), 'w') as f:
+def writeModelData(model_dir, modelData):
+    with open(os.path.join(model_dir, modelData["modelName"]+".txt"), 'w') as f:
         json.dump(modelData, f)
 
 
-   
+
 def deleteDataset(dataset):
     shutil.rmtree(os.path.join(directory, dataset), ignore_errors=False, onerror=None)

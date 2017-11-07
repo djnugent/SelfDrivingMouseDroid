@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from keras.callbacks import ModelCheckpoint, RemoteMonitor, TensorBoard
 from keras.models import load_model
 from datetime import datetime
+from dataManage import *
 
 ## Add Sibling directory to PATH
 import sys, os
@@ -92,6 +93,12 @@ def cacheDataset(dataset,storage_directory, tmp_directory):
 def trainOn(modelData, config=""):
       train_samples = []
       test_samples = []
+
+      model_dir = os.path.join(model_dir, modelData["name"])
+      if not os.path.exists(model_dir):
+          os.makedirs(model_dir, exist_ok=True)
+
+      writeModelData(model_dir, modelData)
 
       print("Parsing CSV")
       # Iterate through each dataset
