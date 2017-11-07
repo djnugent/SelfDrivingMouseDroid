@@ -225,7 +225,7 @@ class Record():
         last_entry = 0
         data = None
         self.isRunning = True
-        self.recording = True
+        self.recording = False
         print(">> Recording")
         try:
             # Record while we are connected or until ctrl-c
@@ -239,6 +239,7 @@ class Record():
                             self.isRunning = False
                             break
                 # Only record in auto mode
+                print(">> car mode: {}".format(car.mode))
                 if car.mode != "auto":
                     if self.recording:
                         # Close last batch
