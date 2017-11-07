@@ -234,7 +234,7 @@ class Record():
                     if self.recording and self.stopRunning:
                         if data is not None:
                             data.close()
-                            data = None
+                            #data = None
                             self.recording = False
                             self.isRunning = False
                             break
@@ -301,7 +301,7 @@ class Record():
 
                         # print debug
                         fps = round(1.0/(timestamp - last_entry),2)
-                        print("Batch: {}, Frame: {} -- fps: {} -- mode: {}, str: {}, thr: {}, aux1: {}, aux2: {}".format(batch_num-1,frame_count,fps,mode,channels["steering"][0], channels["throttle"][0],channels["aux1"][0],channels["aux2"][0]))
+                        print("Batch: {}, Frame: {} -- fps: {} -- mode: {}, str: {}, thr: {}, aux1: {}, aux2: {}".format(batch_num-1,frame_count,fps,mode,channels["steering"], channels["throttle"],channels["aux1"],channels["aux2"]))
 
                         # update state
                         frame_count += 1
