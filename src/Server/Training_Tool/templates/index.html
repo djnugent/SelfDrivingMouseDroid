@@ -58,7 +58,7 @@ initData({{data|tojson}});
                 Location
                 <span ng-show="sortType == 'location' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                 <span ng-show="sortType == 'location' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
-        <th><a ng-click="sortType = 'recordedBy'; sortReverse = !sortReverse">
+        <th style="width:120px;"><a ng-click="sortType = 'recordedBy'; sortReverse = !sortReverse">
                 Recorded By
                 <span ng-show="sortType == 'recordedBy' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
                 <span ng-show="sortType == 'recordedBy' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
@@ -85,9 +85,10 @@ initData({{data|tojson}});
 
     <tbody>
       <tr ng-repeat="x in data.training_data | orderBy:sortType:sortReverse">
-        <td><input type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="train">Train  </input>
-	    <input type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="test">Test  </input>
-	    <input type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="split">Split </input>
+        <td style="width:180px;">
+      <input type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="train">Train  </input>
+	    <input style="margin-left:5px;" type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="test">Test  </input>
+	    <input style="margin-left:5px;" type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="split">Split </input>
 	</td>
         <td>{{ '{{x.location}}' }}</td>
         <td>{{ '{{x.recorders}}' }}</td>
