@@ -12,13 +12,17 @@ def fetchMetadata():
         for file in files:
             if file == "metadata.txt":
                 with open(os.path.join(subdir, file)) as metadata_file:
-                    data.append(json.load(metadata_file))
-
+                    try:
+                        metadata = json.load(metadata_file)
+                        print(metadata["notes"])
+                        data.append(metadata)
+                    except:
+                        print("Failed to add JSON for " + str(subdir))
     return data
 
 
 def writeModelData(model_dir, modelData):
-    with open(os.path.join(model_dir, modelData["modelName"]+".txt"), 'w') as f:
+    with open(os.path.join(model_dir, "metadata.txt"), 'w') as f:
         json.dump(modelData, f)
 
 
