@@ -94,7 +94,8 @@ def trainOn(modelData, config=""):
       train_samples = []
       test_samples = []
 
-      model_dir = os.path.join(model_dir, modelData["name"])
+      datestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+      model_dir = os.path.join(model_dir, datestamp)
       if not os.path.exists(model_dir):
           os.makedirs(model_dir, exist_ok=True)
 
