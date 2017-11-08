@@ -14,7 +14,7 @@ def fetchMetadata():
                 with open(os.path.join(subdir, file)) as metadata_file:
                     try:
                         metadata = json.load(metadata_file)
-                        print(metadata["notes"])
+                        #print(metadata["notes"])
                         data.append(metadata)
                     except:
                         print("Failed to add JSON for " + str(subdir))
