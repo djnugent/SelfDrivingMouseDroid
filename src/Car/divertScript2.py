@@ -11,25 +11,28 @@ degToServo = 5
 minThrottle = 1555
 
 def main():
-	#define record and car variables
-	 car = Car()
-	 car.connect(port="/dev/ttyACM0")
+    #define record and car variables
+     car = Car()
+     car.connect(port="/dev/ttyACM0")
      print("Waiting to hear from vehicle...")
      while(not car.connected):
           time.sleep(0.05)
      print('connected')
-	 record = Record()
-	 #have a while loop so multiple runs can be executed
-	 while(true):
-	      print("Enter a negative double to go left\nor a positive double to go right\nelse type exit to quit\n")
-		  divert = (input('<< '))
-		  try:
+     record = Record()
+     #have a while loop so multiple runs can be executed
+     while(true):
+          print("Enter a negative double to go left\nor a positive double to go right\nelse type exit to quit\n")
+          divert = (input('<< '))
+          try:
                divert = float(divert)
           
           except ValueError:
                break
-		  
-		  executeManeuver(divert, car, record)
+          
+          executeManeuver(divert, car, record)
+          
+     record.close()
+     car.close()
 
 def executeManeuver(dist, car, record):
      try:
