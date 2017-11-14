@@ -47,7 +47,7 @@ time.sleep(0.3)
 
 # Load model
 print( ">> Loading Model... ")
-model_path = "/home/odroid/models/model.h5"
+model_path = "/home/odroid/models/model.best.h5"
 model = load_model(model_path,custom_objects={'mean_precision_error': mean_precision_error})
 
 # Wait for controller to be turned on or in range
