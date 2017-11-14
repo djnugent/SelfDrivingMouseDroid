@@ -94,11 +94,12 @@ def trainOn(modelData, config=""):
       train_samples = []
       test_samples = []
 
-      model_dir = os.path.join(model_dir, modelData["name"])
-      if not os.path.exists(model_dir):
-          os.makedirs(model_dir, exist_ok=True)
+      datestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+      model_subdir = os.path.join(model_dir, datestamp)
+      if not os.path.exists(model_subdir):
+          os.makedirs(model_subdir, exist_ok=True)
 
-      writeModelData(model_dir, modelData)
+      writeModelData(model_subdir, modelData)
 
       print("Parsing CSV")
       # Iterate through each dataset
@@ -158,8 +159,8 @@ def trainOn(modelData, config=""):
       tb = TensorBoard(log_dir=log_path)
 
       # Checkpoint callback
-      best_model_path= model_dir + "model.best.h5"
-      model_path = model_dir + "model.h5"
+      best_model_path= model_subdir + "model.best.h5"
+      model_path = model_subdir + "model.h5"
       checkpoint = ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1, save_best_only=True)
 
       # model

@@ -90,6 +90,7 @@ class Record():
     def close(self):
         #close all files and do any finishing work here
         self.stop_recording()
+        self.recording = False
     
     def set_mode(self,mode):
         self.record_mode = mode
@@ -105,7 +106,7 @@ class Record():
         else:
             self.thread = threading.Thread(target=self.auto_recording, args=(car,))
             #auto_recording(car)
-        self.recording = True
+        # self.recording = True
         self.thread.start()
         
     def manual_recording(self,car):
@@ -225,7 +226,7 @@ class Record():
         last_entry = 0
         data = None
         self.isRunning = True
-        self.recording = False
+        # self.recording = False
         print(">> Recording")
         try:
             # Record while we are connected or until ctrl-c
@@ -337,6 +338,7 @@ class Record():
             with self.running_lock:
                 stillRunning = self.isRunning
         
+        self.recording = True
         print(">> Stopped Recording")
             
     
