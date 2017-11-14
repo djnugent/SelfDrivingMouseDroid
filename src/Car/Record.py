@@ -41,6 +41,7 @@ class Record():
         self.recording = False
         # Connect to Camera
         self.batch_size = 0
+        self.batch_num = 0
         self.cam = None
         self.thread = None
         self.record_mode = 0
@@ -91,6 +92,8 @@ class Record():
         #close all files and do any finishing work here
         self.stop_recording()
         self.recording = False
+        self.cam.Close()
+        self.thread.join()
     
     def set_mode(self,mode):
         self.record_mode = mode
@@ -100,6 +103,7 @@ class Record():
         #check with user to see if the information is correct
         
     def start_recording(self,car):
+        self.stopRunning = False
         #check to see what mode it is in, call proper recording method 
         if self.record_mode is None:
             self.thread = threading.Thread(target=self.manual_recording, args=(car,))
@@ -107,13 +111,14 @@ class Record():
             self.thread = threading.Thread(target=self.auto_recording, args=(car,))
             #auto_recording(car)
         # self.recording = True
+        print(self.batch_num)
         self.thread.start()
         
     def manual_recording(self,car):
         #manual recording method
         # Start recording
         frame_count = 0
-        batch_num = 0
+        #self.batch_num = 0
         last_entry = 0
         data = None
         self.isRunning = True
@@ -122,7 +127,7 @@ class Record():
             # Record while we are connected or until ctrl-c
             while car.connected:
                 with self.running_lock:
-                    if self.recording and self.stopRunning:
+                    if self.stopRunning:
                         if data is not None:
                             data.close()
                             data = None
@@ -150,7 +155,7 @@ class Record():
                             data.close()
                             data = None
                         # Create new batch
-                        batch_dir = self.directory + "/" + self.run_name + "/" + str(batch_num)
+                        batch_dir = self.directory + "/" + self.run_name + "/" + str(self.batch_num)
                         if not os.path.exists(batch_dir):
                             os.makedirs(batch_dir)
 
@@ -159,7 +164,7 @@ class Record():
                         data.write("timestamp,img_file,steering,throttle,aux1,aux2,mode\n")
 
                         # update state
-                        batch_num += 1
+                        self.batch_num += 1
                         frame_count = 0
                        
 
@@ -176,7 +181,7 @@ class Record():
                         image = self.cam.GetFrame()
 
                         # Save image - subtract 1 from batch number because batch_number is actually next batch number
-                        img_file = "{}/{}/{}.png".format(self.run_name,str(batch_num-1),str(frame_count)) 
+                        img_file = "{}/{}/{}.png".format(self.run_name,str(self.batch_num-1),str(frame_count)) 
                         imageio.imwrite(self.directory + "/" + img_file,image,compression=1)
                        
                         # Save entry
@@ -191,7 +196,7 @@ class Record():
 
                         # print debug
                         fps = round(1.0/(timestamp - last_entry),2)
-                        print("Batch: {}, Frame: {} -- fps: {} -- mode: {}, str: {}, thr: {}, aux1: {}, aux2: {}".format(batch_num-1,frame_count,fps,mode,channels["steering"][0], channels["throttle"][0],channels["aux1"][0],channels["aux2"][0]))
+                        print("Batch: {}, Frame: {} -- fps: {} -- mode: {}, str: {}, thr: {}, aux1: {}, aux2: {}".format(self.batch_num-1,frame_count,fps,mode,channels["steering"][0], channels["throttle"][0],channels["aux1"][0],channels["aux2"][0]))
 
                         # update state
                         frame_count += 1
@@ -222,17 +227,17 @@ class Record():
         #auto recording method
                 # Start recording
         frame_count = 0
-        batch_num = 0
+        #self.batch_num = 0
         last_entry = 0
         data = None
         self.isRunning = True
-        # self.recording = False
+        self.recording = False
         print(">> Recording")
         try:
             # Record while we are connected or until ctrl-c
             while car.connected:
                 with self.running_lock:
-                    if self.recording and self.stopRunning:
+                    if self.stopRunning:
                         if data is not None:
                             data.close()
                             #data = None
@@ -261,7 +266,7 @@ class Record():
                             data.close()
                             data = None
                         # Create new batch
-                        batch_dir = self.directory + "/" + self.run_name + "/" + str(batch_num)
+                        batch_dir = self.directory + "/" + self.run_name + "/" + str(self.batch_num)
                         if not os.path.exists(batch_dir):
                             os.makedirs(batch_dir)
 
@@ -270,7 +275,7 @@ class Record():
                         data.write("timestamp,img_file,steering,throttle,aux1,aux2,mode\n")
 
                         # update state
-                        batch_num += 1
+                        self.batch_num += 1
                         frame_count = 0
                        
 
@@ -287,7 +292,7 @@ class Record():
                         image = self.cam.GetFrame()
 
                         # Save image - subtract 1 from batch number because batch_number is actually next batch number
-                        img_file = "{}/{}/{}.png".format(self.run_name,str(batch_num-1),str(frame_count)) 
+                        img_file = "{}/{}/{}.png".format(self.run_name,str(self.batch_num-1),str(frame_count)) 
                         imageio.imwrite(self.directory + "/" + img_file,image,compression=1)
                        
                         # Save entry
@@ -302,7 +307,7 @@ class Record():
 
                         # print debug
                         fps = round(1.0/(timestamp - last_entry),2)
-                        print("Batch: {}, Frame: {} -- fps: {} -- mode: {}, str: {}, thr: {}, aux1: {}, aux2: {}".format(batch_num-1,frame_count,fps,mode,channels["steering"], channels["throttle"],channels["aux1"],channels["aux2"]))
+                        print("Batch: {}, Frame: {} -- fps: {} -- mode: {}, str: {}, thr: {}, aux1: {}, aux2: {}".format(self.batch_num-1,frame_count,fps,mode,channels["steering"], channels["throttle"],channels["aux1"],channels["aux2"]))
 
                         # update state
                         frame_count += 1
@@ -320,12 +325,13 @@ class Record():
         finally:
             print (">> Done!")
             # close data file
-            data.close()
+            if(data != None):
+                 data.close()
             # Sync all buffers
             os.sync()
             # close camera
-            self.cam.Close()
-            self.thread.join()
+            #self.cam.Close()
+            #self.thread.join() #do a try finally in the main thread
         
     def stop_recording(self):
         #stop the recording multi-threading?
