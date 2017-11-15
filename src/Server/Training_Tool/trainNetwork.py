@@ -159,8 +159,8 @@ def trainOn(modelData, config=""):
       tb = TensorBoard(log_dir=log_path)
 
       # Checkpoint callback
-      best_model_path= model_subdir + "model.best.h5"
-      model_path = model_subdir + "model.h5"
+      best_model_path= os.path.join(model_subdir, "model.best.h5")
+      model_path = os.path.join(model_subdir, "model.h5")
       checkpoint = ModelCheckpoint(best_model_path, monitor='val_loss', verbose=1, save_best_only=True)
 
       # model
