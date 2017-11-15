@@ -14,6 +14,8 @@ from model import preprocess_camera, postprocess_steering, mean_precision_error,
 ########### CONFIG ######################
 # Port for Arduino
 port = "/dev/ttyACM0"
+# Model to use
+model_path = "/home/odroid/models/model.best.h5"
 ########### END CONFIG ##################
 
 print( ">> Autonomous Prime - CNN Drive ")
@@ -47,7 +49,6 @@ time.sleep(0.3)
 
 # Load model
 print( ">> Loading Model... ")
-model_path = "/home/odroid/models/model.best.h5"
 model = load_model(model_path,custom_objects={'mean_precision_error': mean_precision_error})
 
 # Wait for controller to be turned on or in range
