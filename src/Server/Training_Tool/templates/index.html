@@ -41,11 +41,11 @@ initData({{data|tojson}});
   <h2>Train the Network</h2>
 
 <div id="table">
-  <form hidden>
+  <form>
     	<div class="form-group">
     		<div class="input-group">
         		<div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
-        		<input type="text" class="form-control" placeholder="Search Training Data" ng-model="searchData">
+        		<input type="text" class="form-control" placeholder="Filter Training Data" ng-model="data.search">
       		</div>
     	</div>
   	</form>
@@ -84,7 +84,7 @@ initData({{data|tojson}});
     </thead>
 
     <tbody>
-      <tr ng-repeat="x in data.training_data | orderBy:sortType:sortReverse">
+      <tr ng-repeat="x in data.training_data | filter: data.search"> <!-- | orderBy:sortType:sortReverse"-->
         <td style="width:180px;">
       <input type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="train">Train  </input>
 	    <input style="margin-left:5px;" type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="test">Test  </input>
