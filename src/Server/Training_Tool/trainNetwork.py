@@ -38,7 +38,7 @@ log_dir = "/remote/rs/ecpeprime/training_logs/"
 
 # Generate batches of data
 # Randomly Drop near zero batches
-def gen(samples, batch_size=32, augment = False):
+def gen(samples, batch_size=32, aug = False):
 
     while 1: # Loop forever so the generator never terminates
         shuffle(samples)
@@ -58,7 +58,7 @@ def gen(samples, batch_size=32, augment = False):
             image = imageio.imread(cache_dir + sample["img_file"])
 
             # Augment data with noise and lighting changes
-            if augment:
+            if aug:
                 image = augment(image)
 
             # Prepare image for network
@@ -150,10 +150,10 @@ def trainOn(modelData, config=""):
       '''
 
       # See if we should augment data
-      augment = False
+      aug = False
       if modelData["augmentations"]['simple_uniform'] or modelData["augmentations"]['skew'] or modelData["augmentations"]['bin_uniform']:
           print("Using augmentation")
-          augment = True
+          aug = True
 
       # Training parameters
       batch_size = 64
@@ -166,7 +166,7 @@ def trainOn(modelData, config=""):
       print("Testing samples: {}".format(test_epoch_size))
 
       # Create generators
-      train_generator = gen(train_samples, batch_size=batch_size, augment = augment)
+      train_generator = gen(train_samples, batch_size=batch_size, augment = aug)
       validation_generator = gen(test_samples, batch_size=batch_size, augment = False)
 
       # Tensorboard
