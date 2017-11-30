@@ -16,6 +16,7 @@ from keras.callbacks import ModelCheckpoint, RemoteMonitor, TensorBoard
 from keras.models import load_model
 from datetime import datetime
 from dataManage import *
+from augment import augment
 
 ## Add Sibling directory to PATH
 import sys, os
@@ -33,9 +34,11 @@ model_dir = "/remote/rs/ecpeprime/pretrained_models/"
 # Location of logs
 log_dir = "/remote/rs/ecpeprime/training_logs/"
 
+
+
 # Generate batches of data
 # Randomly Drop near zero batches
-def gen(samples, batch_size=32):
+def gen(samples, batch_size=32, augment = False):
 
     while 1: # Loop forever so the generator never terminates
         shuffle(samples)
@@ -53,6 +56,12 @@ def gen(samples, batch_size=32):
 
             # read in image
             image = imageio.imread(cache_dir + sample["img_file"])
+
+            # Augment data with noise and lighting changes
+            if augment:
+                image = augment(image)
+
+            # Prepare image for network
             image = preprocess_camera(image)
 
             images.append(image)
@@ -140,6 +149,12 @@ def trainOn(modelData, config=""):
       test_bins,test_max_bin_size = bin_samples(test_samples,num_bins)
       '''
 
+      # See if we should augment data
+      augment = False
+      if modelData["augmentations"]['simple_uniform'] or modelData["augmentations"]['skew'] or modelData["augmentations"]['bin_uniform']:
+          print("Using augmentation")
+          augment = True
+
       # Training parameters
       batch_size = 64
       epochs = 50
@@ -151,8 +166,8 @@ def trainOn(modelData, config=""):
       print("Testing samples: {}".format(test_epoch_size))
 
       # Create generators
-      train_generator = gen(train_samples, batch_size=batch_size)
-      validation_generator = gen(test_samples, batch_size=batch_size)
+      train_generator = gen(train_samples, batch_size=batch_size, augment = augment)
+      validation_generator = gen(test_samples, batch_size=batch_size, augment = False)
 
       # Tensorboard
       log_path = log_dir + datetime.now().strftime('%m_%d_%Y--%H_%M')
