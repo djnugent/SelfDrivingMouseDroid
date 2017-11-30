@@ -166,8 +166,8 @@ def trainOn(modelData, config=""):
       print("Testing samples: {}".format(test_epoch_size))
 
       # Create generators
-      train_generator = gen(train_samples, batch_size=batch_size, augment = aug)
-      validation_generator = gen(test_samples, batch_size=batch_size, augment = False)
+      train_generator = gen(train_samples, batch_size=batch_size, aug = aug)
+      validation_generator = gen(test_samples, batch_size=batch_size, aug = False)
 
       # Tensorboard
       log_path = log_dir + datetime.now().strftime('%m_%d_%Y--%H_%M')
