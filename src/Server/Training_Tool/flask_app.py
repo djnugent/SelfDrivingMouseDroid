@@ -17,6 +17,10 @@ def index():
     metadata = fetchMetadata()
     return flask.render_template('index.html', data = metadata)
 
+@APP.route('/models')
+def models():
+    modelData = fetchModelData()
+    return flask.render_template('models.html', data = modelData)
 
 @APP.route('/train', methods=['POST'])
 def train():
