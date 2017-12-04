@@ -22,6 +22,14 @@ h2 {
 	font-weight: 500;
 	line-height: 15.4px;
 }
+h4 {
+	font-family: 'Ubuntu Condensed', sans-serif;
+	font-size: 14px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 300;
+	line-height: 20px;
+}
 p {
 	font-family: 'Ubuntu Condensed', sans-serif;
 	font-size: 14px;
@@ -57,6 +65,21 @@ color: #4f4f4f;
 .title h2 {
   padding-right:120px;
 }
+
+.navbar {
+  border-bottom: solid #aaa;
+  text-size: 30;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+.navbar a {
+  margin: 1px 40px;
+  color: #4f4f4f;
+}
+.navbar .active {
+  font-weight: bold;
+}
+
 .content h2 {
   padding:20px;
 
