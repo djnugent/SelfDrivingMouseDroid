@@ -87,7 +87,7 @@ run_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 metadata["date"] = run_name
 if not os.path.exists(directory + "/" + run_name):
     os.makedirs(directory + "/" + run_name)# name describing this run
-metadata_file = open(directory+ "/" + run_name + "/metadata.txt", 'w')
+metadata_file = open(directory + "/" + run_name + "/metadata.txt", 'w')
 json.dump(metadata, metadata_file)
 
 # State variables

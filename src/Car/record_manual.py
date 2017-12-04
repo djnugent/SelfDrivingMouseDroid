@@ -33,7 +33,7 @@ record_rate = 9 #fps
 print( ">> Autonomous Prime - Collect Training Data ")
 
 # Connect to Camera
-# locate camera 
+# locate camera
 devpath = ocam.FindCamera('oCam')
 if(devpath is None):
     sys.exit()
@@ -41,7 +41,7 @@ cam = ocam.oCams(devpath, verbose=0)
 
 # set format to 1280*720. Must be set before starting the camera
 cam.Set((b'Greyscale 8-bit (Y800)', 1280, 720, 60))
-# Open camera    
+# Open camera
 print(">> Opening camera")
 cam.Start()
 # Clear camera buffer. First few frames are usually corrupt
@@ -79,13 +79,13 @@ metadata["tags"] = (input('<< Tags (separated by commas): ') or "").lower()
 metadata["notes"] = (input('<< Any Notes: ') or "").lower()
 
 
-print('>> Writing metadata...') 
+print('>> Writing metadata...')
 # Create Folder for this Run based on current timestamp
 run_name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 metadata["date"] = run_name
 if not os.path.exists(directory + "/" + run_name):
     os.makedirs(directory + "/" + run_name)# name describing this run
-metadata_file = open(directory+ "/" + run_name + "/metadata.txt", 'w') 
+metadata_file = open(directory + "/" + run_name + "/metadata.txt", 'w') 
 json.dump(metadata, metadata_file)
 
 # State variables
@@ -94,7 +94,7 @@ batch_num = 0 # count
 last_entry = 0 # time
 data = None # File descriptor
 recording = False # whether we WERE in a recording
-    
+
 
 # Start recording
 print(">> Recording")
@@ -111,7 +111,7 @@ try:
                 recording = False
             print(">> Switch into MANUAL mode to start recording")
             time.sleep(0.3)
-                
+
         else:
             # Check to see if we should create a new batch
             if frame_count == batch_size or not recording:
@@ -133,24 +133,24 @@ try:
                 # update state
                 batch_num += 1
                 frame_count = 0
-               
+
 
             # Record data at certain frequency
             if time.time() - last_entry > 1.0/record_rate:
-                # Timestamp entry            
+                # Timestamp entry
                 timestamp = time.time()
-                
+
                 # Get RC Controller channels
                 channels = car.channels_in;
                 mode = car.mode;
-                
+
                 # grab image
                 image = cam.GetFrame()
 
                 # Save image - subtract 1 from batch number because batch_number is actually next batch number
-                img_file = "{}/{}/{}.png".format(run_name,str(batch_num-1),str(frame_count)) 
+                img_file = "{}/{}/{}.png".format(run_name,str(batch_num-1),str(frame_count))
                 imageio.imwrite(directory + "/" + img_file,image,compression=1)
-               
+
                 # Save entry
                 entry = "{}, {}, {}, {}, {}, {}, {}\n".format(str(timestamp),
                                                             str(img_file),
@@ -170,13 +170,13 @@ try:
                 last_entry = timestamp
 
 
-    
+
     # Check to see if we ended gracefully
     if not car.connected:
-        print(">> ERROR: Car disconnected. Stopped recording") 
+        print(">> ERROR: Car disconnected. Stopped recording")
     if car.mode == "failsafe":
-        print(">> ERROR: Car went into failsafe mode. Stopped recording") 
-        
+        print(">> ERROR: Car went into failsafe mode. Stopped recording")
+
 
 finally:
     print (">> Done!")
@@ -188,7 +188,3 @@ finally:
     cam.Close()
     # Close connection to car
     car.close()
-
-
-    
-
