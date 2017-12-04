@@ -63,6 +63,7 @@ initData({{data|tojson}});
     <thead>
       <tr>
         <th>Model Name</th>
+        <th>Date</th>
         <th>Augmentations</th>
         <th>Notes</th>
 
@@ -72,6 +73,7 @@ initData({{data|tojson}});
     <tbody>
       <tr ng-repeat="x in data.training_data | orderBy:sortType:sortReverse">
         <td>{{ '{{x.name}}' }}</td>
+        <td>{{ '{{x.date}}' }}</td>
         <td>Bin Uniform: {{ '{{x.augmentations.bin_uniform}}' }}</td>
         <td>{{ '{{x.notes}}' }}</td>
       </tr>
