@@ -26,11 +26,11 @@ def writeModelData(model_dir, modelData):
     with open(os.path.join(model_dir, "metadata.txt"), 'w') as f:
         json.dump(modelData, f)
 
-def fetchModelData();
+def fetchModelData():
     print("Fetching Model Data")
 
     data = [];
-    for subdir, dirs, files in os.walk(ModelDirectory):
+    for subdir, dirs, files in os.walk(modelDirectory):
         for file in files:
             if file == "metadata.txt":
                 with open(os.path.join(subdir, file)) as metadata_file:

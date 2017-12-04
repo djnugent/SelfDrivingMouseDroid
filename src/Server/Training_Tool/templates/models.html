@@ -53,31 +53,7 @@ initData({{data|tojson}});
     <thead>
       <tr>
         <th>Model Name</th>
-        <th>Creation Date</th>
-        <!-- <th><a ng-click="sortType = 'location'; sortReverse = !sortReverse;">
-                Location
-                <span ng-show="sortType == 'location' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                <span ng-show="sortType == 'location' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
-        <th><a ng-click="sortType = 'recordedBy'; sortReverse = !sortReverse">
-                Recorded By
-                <span ng-show="sortType == 'recordedBy' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                <span ng-show="sortType == 'recordedBy' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
-        <th><a ng-click="sortType = 'date'; sortReverse = !sortReverse">
-                Date
-                <span ng-show="sortType == 'date' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                <span ng-show="sortType == 'date' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
-        <th><a ng-click="sortType = 'obstacles'; sortReverse = !sortReverse">
-                Obstacles
-                <span ng-show="sortType == 'obstacles' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                <span ng-show="sortType == 'obstacles' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
-        <th><a ng-click="sortType = 'pedestrians'; sortReverse = !sortReverse">
-                Pedestrians
-                <span ng-show="sortType == 'pedestrians' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                <span ng-show="sortType == 'pedestrians' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th>
-        <th><a ng-click="sortType = 'tags'; sortReverse = !sortReverse">
-                Tags
-                <span ng-show="sortType == 'tags' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
-                <span ng-show="sortType == 'tags' && sortReverse" class="glyphicon glyphicon-chevron-up"></span></a></th> -->
+        <th>Augmentations</th>
         <th>Notes</th>
 
       </tr>
@@ -85,18 +61,14 @@ initData({{data|tojson}});
 
     <tbody>
       <tr ng-repeat="x in data.training_data | orderBy:sortType:sortReverse">
-        <td><input type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="train">Train  </input>
-	          <input type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="test">Test  </input>
-	          <input type="radio" name="{{ '{{x.date}}' }}" ng-model="x.use" value="split">Split </input>
-	      </td>
         <td>{{ '{{x.name}}' }}</td>
-        <td>{{ '{{x.date}}' }}</td>
+        <td>Bin Uniform: {{ '{{x.augmentations.bin_uniform}}' }}</td>
         <td>{{ '{{x.notes}}' }}</td>
       </tr>
     </tbody>
   </table>
 
-  <div class="form-group">
+  <div class="form-group" hidden>
     <button class="btn btn-default" data-toggle="modal" data-target="#modelExpanded">Train</button>
     <!--<button class="btn btn-default" ng-click="doit()">Do the thing</button>-->
   </div>
